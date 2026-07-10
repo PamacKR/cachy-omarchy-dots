@@ -65,10 +65,10 @@ show_install_menu() {
 }
 
 show_remove_menu() {
-  case $(menu "Remove" "󰣇  Package\n  Web App\n󰣇  AUR") in
+  case $(menu "Remove" "󰣇  Package\n󰣇  AUR\n  Web App") in
   *Package*) terminal cachy-pkg-remove ;;
-  *Web*) present_terminal "uninstall-web-apps" ;;
   *AUR*) terminal cachy-pkg-remove ;;
+  *Web*) present_terminal "uninstall-web-apps" ;;
   *) show_main_menu ;;
   esac
 }
@@ -254,59 +254,6 @@ show_setup_menu() {
   esac
 }
 
-show_update_process_menu() {
-  case $(menu "Restart" "󰎟  Mako\n  Swayosd\n󰌧  Walker\n󰍜  DMS") in
-  *Mako*) cachy-restart-mako ;;
-  *Swayosd*) cachy-restart-swayosd ;;
-  *Walker*) cachy-restart-walker ;;
-  *DMS*) cachy-restart-dms ;;
-  *) show_update_menu ;;
-  esac
-}
-
-show_update_config_menu() {
-  case $(menu "Restore default" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
-  *Niri*) present_terminal "cachy-refresh-config config/niri/config.kdl" ;;
-  *Keybinds*) present_terminal "cachy-refresh-config config/niri/dms/binds.kdl" ;;
-  *Plymouth*) present_terminal "cachy-refresh-config plymouth/omarchy-look/omarchy-look.script" ;;
-  *Swayosd*) present_terminal "cachy-refresh-config config/swayosd/config.toml cachy-restart-swayosd" ;;
-  *Walker*) present_terminal "cachy-refresh-config config/walker/config.toml cachy-restart-walker" ;;
-  *Mako*) present_terminal "cachy-refresh-config config/mako/core.ini cachy-restart-mako" ;;
-  *) show_update_menu ;;
-  esac
-}
-
-show_update_hardware_menu() {
-  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
-  *Audio*) present_terminal cachy-restart-pipewire ;;
-  *Wi-Fi*) present_terminal cachy-restart-wifi ;;
-  *Bluetooth*) present_terminal cachy-restart-bluetooth ;;
-  *Trackpad*) present_terminal cachy-restart-trackpad ;;
-  *) show_update_menu ;;
-  esac
-}
-
-show_update_password_menu() {
-  case $(menu "Update Password" "  Drive Encryption\n  User") in
-  *Drive*) present_terminal cachy-drive-password ;;
-  *User*) present_terminal passwd ;;
-  *) show_update_menu ;;
-  esac
-}
-
-show_update_menu() {
-  case $(menu "Update" "  Config\n  Process\n  Hardware\n  Firmware\n  Password\n  Timezone\n  Time") in
-  *Config*) show_update_config_menu ;;
-  *Process*) show_update_process_menu ;;
-  *Hardware*) show_update_hardware_menu ;;
-  *Firmware*) present_terminal "sudo fwupdmgr refresh --force && sudo fwupdmgr update" ;;
-  *Timezone*) present_terminal cachy-tz-select ;;
-  *Time*) present_terminal cachy-update-time ;;
-  *Password*) show_update_password_menu ;;
-  *) show_main_menu ;;
-  esac
-}
-
 show_about() {
   launch-tui bash -c 'fastfetch; read -n 1 -s'
 }
@@ -329,7 +276,7 @@ show_system_menu() {
 }
 
 show_main_menu() {
-  go_to_menu "$(menu "Go" "󰀻  Apps\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  About\n  System")"
+  go_to_menu "$(menu "Go" "󰀻  Apps\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  About\n  System")"
 }
 
 go_to_menu() {
@@ -341,7 +288,6 @@ go_to_menu() {
   *power*) show_setup_power_menu ;;
   *install*) show_install_menu ;;
   *remove*) show_remove_menu ;;
-  *update*) show_update_menu ;;
   *about*) show_about ;;
   *system*) show_system_menu ;;
   esac
