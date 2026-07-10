@@ -28,16 +28,34 @@ if ! command -v dms >/dev/null 2>&1 && [[ ! -x /usr/bin/dms ]]; then
 fi
 
 # --- Packages ----------------------------------------------------------------
+#
+# Package names/repo placement (official vs AUR) drift over time and I can't
+# verify them against a live pacman database from here, so instead of one
+# atomic `pacman -S pkg1 pkg2 ...` (which aborts entirely if a single name is
+# wrong or AUR-only), install one at a time: try pacman first, fall back to
+# yay, and warn (without aborting the whole script) if neither has it.
 
-log "Installing packages via pacman..."
-sudo pacman -S --needed --noconfirm \
-  walker elephant mako alacritty imv evince mpv swayosd tesseract tesseract-data-eng \
-  ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swaybg swayidle grim slurp wl-clipboard jq
+command -v yay >/dev/null 2>&1 || {
+  echo "error: yay not found. Install yay first (you said you would), then re-run." >&2
+  exit 1
+}
 
-# yay/AUR helper fallback for anything not in the official repos on your setup:
-if command -v yay >/dev/null 2>&1; then
-  yay -S --needed --noconfirm walker-bin elephant-bin 2>/dev/null || true
-fi
+PACKAGES=(
+  walker elephant mako alacritty imv evince mpv swayosd tesseract tesseract-data-eng
+  ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swaybg swayidle
+  grim slurp wl-clipboard jq
+)
+
+log "Installing packages (pacman, falling back to yay/AUR per-package)..."
+for pkg in "${PACKAGES[@]}"; do
+  if pacman -Si "$pkg" >/dev/null 2>&1; then
+    sudo pacman -S --needed --noconfirm "$pkg"
+  elif yay -Si "$pkg" >/dev/null 2>&1; then
+    yay -S --needed --noconfirm "$pkg"
+  else
+    echo "warning: couldn't find package '$pkg' in official repos or AUR - skipping. You may need to install it manually under a different name." >&2
+  fi
+done
 
 # --- Symlink dotfiles --------------------------------------------------------
 
