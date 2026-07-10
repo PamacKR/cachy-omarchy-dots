@@ -43,7 +43,7 @@ command -v yay >/dev/null 2>&1 || {
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd tesseract tesseract-data-eng
   ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swaybg swayidle
-  grim slurp wl-clipboard jq sddm plymouth
+  grim slurp wl-clipboard jq sddm plymouth qt5-declarative qt5-svg
 )
 
 log "Installing packages (pacman, falling back to yay/AUR per-package)..."
