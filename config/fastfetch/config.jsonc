@@ -5,10 +5,11 @@
   // interactively: `fastfetch -c ~/.config/fastfetch/config.jsonc` re-renders
   // instantly, no restart needed.
   "logo": {
-    // Built-in ASCII logos are fixed text, not actually rescalable via
-    // width/padding - those only adjust spacing around it. "_small" is
-    // fastfetch's naming convention for compact distro logo variants.
-    "source": "cachyos_small",
+    // Custom blocky "C" logo instead of the built-in CachyOS ASCII art -
+    // plain text file with the color baked in as a raw ANSI escape (tokyo-
+    // night accent, #7aa2f7), so fastfetch just cats it as-is.
+    "type": "file",
+    "source": "~/.config/fastfetch/cachy-logo.txt",
     "padding": {
       "top": 1,
       "right": 2
