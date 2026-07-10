@@ -1,12 +1,27 @@
 // Niri config for the "omarchy-look" setup.
 //
-// Keybinds are intentionally left minimal here — configure them through DMS's
-// own settings panel instead. Only a couple of safety-net binds are kept so
-// you're never locked out of a session even before DMS keybinds are set up.
+// Structure and defaults here are adapted from a known-working niri+DMS
+// reference config (pulled from a working CachyOS+niri+DMS install), rather
+// than guessed from scratch - DMS's include mechanism in particular needs to
+// match exactly what DMS itself expects to generate/read.
+//
+// Keybinds: DMS generates/manages `dms/binds.kdl` (included below) via its
+// own Keyboard Shortcuts settings page - tune them there, not here.
+
+config-notification {
+    disable-failed
+}
+
+gestures {
+    hot-corners {
+        off
+    }
+}
 
 input {
     keyboard {
         xkb {}
+        numlock
     }
 
     touchpad {
@@ -14,44 +29,99 @@ input {
         natural-scroll
     }
 
-    // Mouse natural-scroll is off by default in niri - no line needed to
-    // disable it (KDL flags are presence-based, "natural-scroll=false" isn't
-    // valid syntax and failed `niri validate`).
     mouse {
     }
 }
 
 layout {
-    gaps 8
-
-    focus-ring {
-        off
-    }
-
-    border {
-        width 2
-    }
+    background-color "transparent"
+    center-focused-column "never"
 
     preset-column-widths {
+        proportion 0.33333
         proportion 0.5
         proportion 0.66667
-        proportion 1.0
     }
 
-    default-column-width {
-        proportion 0.5
+    default-column-width { proportion 0.5; }
+
+    border {
+        off
+        width 4
+        active-color   "#707070"
+        inactive-color "#d0d0d0"
+        urgent-color   "#cc4444"
+    }
+
+    shadow {
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0007"
+    }
+
+    struts {
     }
 }
 
-cursor {
-    xcursor-theme "Breeze"
-    xcursor-size 24
+layer-rule {
+    match namespace="^quickshell$"
+    place-within-backdrop true
+}
+
+overview {
+    workspace-shadow {
+        on
+    }
+}
+
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+}
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+prefer-no-csd
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+animations {
+    workspace-switch {
+        spring damping-ratio=0.80 stiffness=523 epsilon=0.0001
+    }
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+    window-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+    horizontal-view-movement {
+        spring damping-ratio=0.85 stiffness=423 epsilon=0.0001
+    }
+    window-movement {
+        spring damping-ratio=0.75 stiffness=323 epsilon=0.0001
+    }
+    window-resize {
+        spring damping-ratio=0.85 stiffness=423 epsilon=0.0001
+    }
+    config-notification-open-close {
+        spring damping-ratio=0.65 stiffness=923 epsilon=0.001
+    }
+    screenshot-ui-open {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+    overview-open-close {
+        spring damping-ratio=0.85 stiffness=800 epsilon=0.0001
+    }
 }
 
 // Companions that make up the rest of the "Omarchy look": launcher,
-// notifications, OSD, polkit agent, wallpaper. DMS itself is started the same
-// way (or via its own systemd unit if it ships one) — see systemd/user/*.service
-// for the more robust restart-on-crash equivalents of these.
+// notifications, OSD, polkit agent, wallpaper daemon. DMS itself is started
+// the same way. See systemd/user/*.service for the restart-on-crash units.
 spawn-at-startup "systemctl" "--user" "start" "walker.service"
 spawn-at-startup "systemctl" "--user" "start" "mako.service"
 spawn-at-startup "systemctl" "--user" "start" "dms.service"
@@ -61,19 +131,68 @@ spawn-at-startup "systemctl" "--user" "start" "battery-suspend-watch.service"
 spawn-at-startup "swaybg" "-i" "~/.config/cachy-dots/current/background" "-m" "fill"
 
 window-rule {
-    // Keep launcher/picker style popups floating and centered.
-    match app-id="^walker$"
+    match app-id=r#"^org\.gnome\."#
+    draw-border-with-background false
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+window-rule {
+    match app-id=r#"^gnome-control-center$"#
+    match app-id=r#"^pavucontrol$"#
+    match app-id=r#"^nm-connection-editor$"#
+    default-column-width { proportion 0.5; }
+    open-floating false
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.Calculator$"#
+    match app-id=r#"^gnome-calculator$"#
+    match app-id=r#"^galculator$"#
+    match app-id=r#"^blueman-manager$"#
+    match app-id=r#"^xdg-desktop-portal$"#
     open-floating true
 }
 
 window-rule {
-    // The scratch terminal launch-tui/launch-editor spawn for TUI editors etc.
+    match app-id="Alacritty"
+    draw-border-with-background false
+}
+
+// The scratch terminal launch-tui/launch-editor spawn for TUI editors etc.
+window-rule {
     match app-id="^cachy-dots-scratch-term$"
     open-floating true
     default-column-width { proportion 0.6; }
 }
 
-binds {
-    Mod+Shift+Slash { show-hotkey-overlay; }
-    Mod+Shift+E { quit; }
+// Walker is a layer-shell surface, not a regular toplevel, so this is mostly
+// a no-op safety net rather than a required rule.
+window-rule {
+    match app-id="^walker$"
+    open-floating true
 }
+
+// Open DMS's own windows (settings, etc.) floating instead of tiled.
+window-rule {
+    match app-id=r#"org.quickshell$"#
+    match app-id=r#"com.danklinux.dms$"#
+    open-floating true
+}
+
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+// Include DMS-generated/managed fragments. colors/layout/alttab/outputs/
+// cursor/windowrules are auto-generated by DMS at runtime (do not hand-edit,
+// do not commit machine-specific copies of these into the repo) - binds.kdl
+// is the one DMS-managed file we do ship a starting version of, since it's
+// user/DMS-editable rather than purely auto-generated.
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/alttab.kdl"
+include "dms/binds.kdl"
+include "dms/outputs.kdl"
+include "dms/cursor.kdl"
+include "dms/windowrules.kdl"
