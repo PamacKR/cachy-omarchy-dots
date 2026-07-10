@@ -5,22 +5,38 @@ Hyprland-specific tooling and opinionated bloat. Ported from an Omarchy
 install (Hyprland/waybar) - see the full design plan for rationale and
 what's intentionally left out.
 
-## Prerequisites (do these yourself first)
+## Prerequisites
 
-- CachyOS installed, Niri installed, DMS installed.
+- CachyOS installed.
+- Niri and DMS - either installed yourself already (in which case skip to
+  `./install.sh` below), or let `./bootstrap.sh` do it (see below).
 - When installing DMS, **decline its bundled greeter** - this repo installs
   its own minimal SDDM theme.
 
 ## Install
+
+**From a bare CachyOS box** (no yay/Niri/DMS yet):
+
+```sh
+./bootstrap.sh
+```
+
+Installs `base-devel`+`git`, builds `yay` from the AUR, installs Niri, then
+runs DMS's own installer (`curl -fsSL https://install.danklinux.com | sh`) -
+this step is interactive, so make your own choices there - and once that's
+done, hands off straight into `install.sh` for everything else.
+
+**If Niri and DMS are already installed:**
 
 ```sh
 ./install.sh
 ```
 
 Idempotent - installs remaining packages (Walker, mako, swayosd, fonts,
-icons, cursor), symlinks `config/*` into `~/.config`, sets file-type
-associations, installs systemd user units, installs the SDDM + Plymouth
-themes, and applies the tokyo-night color theme.
+icons, cursor), symlinks `config/*` into `~/.config`, symlinks `bin/*` onto
+PATH, installs the web app installer, sets file-type associations, installs
+systemd user units, installs the SDDM + Plymouth themes, and applies the
+tokyo-night color theme.
 
 ## Structure
 
