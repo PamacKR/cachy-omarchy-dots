@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Avahi SSH Server Browser
+Exec=bssh
+Icon=network-workgroup
+NoDisplay=true

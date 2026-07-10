@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Avahi VNC Server Browser
+Exec=bvnc
+Icon=network-workgroup
+NoDisplay=true

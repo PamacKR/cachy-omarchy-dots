@@ -84,6 +84,17 @@ for entry in "$CACHY_DOTS_PATH"/config/*; do
     done
     continue
   fi
+  if [[ "$name" == "local-applications" ]]; then
+    # NoDisplay=true overrides for .desktop files that clutter Walker
+    # (nm-connection-editor's "Advanced Network Configuration", Avahi's
+    # SSH/VNC/Zeroconf browsers) - these go in ~/.local/share/applications,
+    # not ~/.config, so they're not part of the generic loop below.
+    mkdir -p "$HOME/.local/share/applications"
+    for desktop_file in "$entry"/*.desktop; do
+      ln -sf "$desktop_file" "$HOME/.local/share/applications/$(basename "$desktop_file")"
+    done
+    continue
+  fi
   rm -rf "$target"
   ln -s "$entry" "$target"
 done
@@ -127,6 +138,7 @@ xdg-mime default nvim.desktop text/plain text/english text/x-makefile text/x-c++
   text/x-chdr text/x-csrc text/x-java text/x-moc text/x-pascal text/x-tcl text/x-tex \
   application/x-shellscript text/x-c text/x-c++ application/xml text/xml
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+systemctl --user restart elephant.service 2>/dev/null || true
 
 # --- Systemd user units -------------------------------------------------------
 

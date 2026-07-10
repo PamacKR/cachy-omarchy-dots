@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Avahi Zeroconf Browser
+Exec=avahi-discover
+Icon=network-workgroup
+NoDisplay=true
