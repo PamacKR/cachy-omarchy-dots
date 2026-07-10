@@ -28,7 +28,6 @@
     "shell",
     "wm",
     "terminal",
-    "terminalfont",
     "cpu",
     "gpu",
     "memory",
