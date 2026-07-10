@@ -7,7 +7,7 @@ Rectangle {
   height: 480
   color: "#1a1b26"
 
-  property string currentUser: userModel.lastUser
+  property string currentUser: userModel.lastUser !== "" ? userModel.lastUser : userModel.data(userModel.index(0, 0), Qt.DisplayRole)
   property bool loginFailed: false
   property int sessionIndex: {
     for (var i = 0; i < sessionModel.rowCount(); i++) {
@@ -37,6 +37,7 @@ Rectangle {
     Text {
       id: logo
       text: "PAMAC"
+      font.bold: true
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 40
       font.letterSpacing: 6
