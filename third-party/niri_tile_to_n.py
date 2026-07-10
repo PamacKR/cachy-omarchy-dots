@@ -495,6 +495,25 @@ try:
             need_check_rearrange = evt_is_new_window or (evt_is_moved_window and APPLY_TO_MOVED_WINDOWS)
             newest_window_data = win_state[evt_win_id] if need_check_rearrange else None
 
+            # --- Vendoring patch (not upstream) -------------------------------------------------
+            # prev_win_wspace_id (the workspace a window is moving AWAY from) was computed above
+            # but never used - upstream has no handling for "a window departed via move, so the
+            # workspace it left may now have a lone window that should re-maximize" (only closing
+            # a window triggers that, via MAXIMIZE_SOLOS_ON_CLOSE below). Add the same behavior
+            # for the move case, gated on the same flags used for maximize-on-close/move.
+            if (
+                evt_is_moved_window
+                and APPLY_TO_MOVED_WINDOWS
+                and MAXIMIZE_SOLOS_ON_CLOSE
+                and prev_win_wspace_id is not None
+                and not (IGNORED_WORKSPACE_IDS and prev_win_wspace_id in IGNORED_WORKSPACE_IDS)
+            ):
+                remaining_wins = get_windows_by_conditions(win_state, workspace_id=prev_win_wspace_id, is_floating=False)
+                if len(remaining_wins) == 1:
+                    remaining_solo_id = tuple(remaining_wins.keys())[0]
+                    maximize_window(win_state, focus_state, remaining_solo_id)
+            # -------------------------------------------------------------------------------------
+
         elif evt_name == "WindowClosed":
             # Delete closed window state data & remove from windows-per-workspace mapping
             evt_win_id = evt_data["id"]
