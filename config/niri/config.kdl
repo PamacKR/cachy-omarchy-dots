@@ -34,7 +34,10 @@ input {
 }
 
 layout {
-    background-color "transparent"
+    // Matches the tokyo-night theme background (see themes/tokyo-night/colors.toml)
+    // so the gap between SDDM handing off and DMS painting the wallpaper/panel
+    // is a dark screen instead of a grey flash.
+    background-color "#1a1b26"
     center-focused-column "never"
 
     preset-column-widths {
