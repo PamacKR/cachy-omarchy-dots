@@ -112,7 +112,7 @@ sudo rm -rf /usr/share/sddm/themes/omarchy-look
 sudo cp -r "$CACHY_DOTS_PATH/sddm/omarchy-look" /usr/share/sddm/themes/omarchy-look
 sudo mkdir -p /etc/sddm.conf.d
 sudo cp "$CACHY_DOTS_PATH/sddm/10-theme.conf" /etc/sddm.conf.d/10-theme.conf
-sudo cp "$CACHY_DOTS_PATH/sddm/10-wayland.conf" /etc/sddm.conf.d/10-wayland.conf
+sudo rm -f /etc/sddm.conf.d/10-wayland.conf
 sudo systemctl enable sddm.service
 
 # --- Plymouth boot splash ------------------------------------------------------
