@@ -386,9 +386,6 @@ if skt_path is None or skt_path == "":
 # Create separate read/write sockets, since eventstream reader cannot issue actions
 niri_reader = NiriRequests(skt_path)
 niri_action = NiriActions(skt_path)
-# Vendoring patch (not upstream): dedicated 3rd connection for one-off "Windows" queries -
-# see the WorkspacesChanged handler below for why this is needed.
-niri_query = NiriRequests(skt_path)
 
 # Sanity check. Make sure we have the right version
 is_version_ok, version_resp = niri_reader.request("Version")
@@ -447,59 +444,6 @@ try:
             for item in wspace_state.values():
                 if item["is_focused"]:
                     focus_state.workspace_id = item["id"]
-
-            # --- Vendoring patch (not upstream) ---------------------------------------------
-            # Moving a window into an ALREADY-OCCUPIED workspace fires only this event (no
-            # WindowOpenedOrChanged, no WindowsChanged) - so the arrival/departure logic above
-            # never runs for that case. Query niri directly for the current window list and
-            # diff it against our own state to catch any workspace_id change this event alone
-            # doesn't tell us about, then apply the same arrival/departure logic by hand.
-            if win_state is not None and APPLY_TO_MOVED_WINDOWS:
-                is_query_ok, query_resp = niri_query.request("Windows")
-                if is_query_ok:
-                    fresh_windows_by_id = {w["id"]: w for w in query_resp["Windows"]}
-                    for win_id, old_data in list(win_state.items()):
-                        fresh_data = fresh_windows_by_id.get(win_id)
-                        if fresh_data is None:
-                            continue
-                        old_wspace_id = old_data["workspace_id"]
-                        new_wspace_id = fresh_data["workspace_id"]
-                        if new_wspace_id == old_wspace_id:
-                            continue
-
-                        # Update this window's cached state to the fresh values
-                        win_aug_data = get_additional_window_data(fresh_data, wspace_state, output_width_lut)
-                        win_state[win_id] = {**fresh_data, **win_aug_data}
-                        if win_state[win_id]["is_maximized"] or win_state[win_id]["is_floating"]:
-                            continue
-
-                        # Departure side: re-maximize a lone window left behind, same as the
-                        # WindowOpenedOrChanged patch above.
-                        if MAXIMIZE_SOLOS_ON_CLOSE and old_wspace_id is not None and not (
-                            IGNORED_WORKSPACE_IDS and old_wspace_id in IGNORED_WORKSPACE_IDS
-                        ):
-                            remaining_wins = get_windows_by_conditions(win_state, workspace_id=old_wspace_id, is_floating=False)
-                            if len(remaining_wins) == 1:
-                                remaining_solo_id = tuple(remaining_wins.keys())[0]
-                                maximize_window(win_state, focus_state, remaining_solo_id)
-
-                        # Arrival side: same auto-maximize-solo / collapse-on-second-window
-                        # logic as the "Handle window-creation behaviors" block below.
-                        if IGNORED_WORKSPACE_IDS and new_wspace_id and (new_wspace_id in IGNORED_WORKSPACE_IDS):
-                            continue
-                        curr_tile_wins = get_windows_by_conditions(win_state, workspace_id=new_wspace_id, is_floating=False)
-                        num_tile_wins = len(curr_tile_wins)
-                        if num_tile_wins == 0 or num_tile_wins > TILE_TO_N:
-                            continue
-                        if MAXIMIZE_SOLOS and num_tile_wins == 1:
-                            solo_id = tuple(curr_tile_wins.keys())[0]
-                            maximize_window(win_state, focus_state, solo_id)
-                        curr_max_wins = get_windows_by_conditions(curr_tile_wins, is_maximized=True)
-                        num_max_wins = len(curr_max_wins)
-                        if COLLAPSE_SOLOS_ON_OPEN and num_max_wins == 1 and num_tile_wins == 2:
-                            solo_max_id = tuple(curr_max_wins.keys())[0]
-                            collapse_window(win_state, focus_state, solo_max_id)
-            # -----------------------------------------------------------------------------------
 
         elif evt_name == "WorkspaceUrgencyChanged":
             # Update our existing workspace state
