@@ -34,6 +34,16 @@
     "memory",
     "disk",
     "battery",
+    "weather",
+    {
+      // 5 tokyo-night colors as circles, since fastfetch's built-in "colors"
+      // module can only limit the count when using symbol=block/background,
+      // not symbol=circle - a custom command gives full control instead.
+      "type": "command",
+      "key": " ",
+      "keyColor": null,
+      "text": "printf '\\033[38;2;122;162;247m\\u25cf \\033[38;2;247;118;142m\\u25cf \\033[38;2;158;206;106m\\u25cf \\033[38;2;224;175;104m\\u25cf \\033[38;2;173;142;230m\\u25cf\\033[0m'"
+    },
     "break"
   ]
 }
