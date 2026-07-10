@@ -46,10 +46,10 @@ PACKAGES=(
   grim slurp wl-clipboard jq sddm plymouth qt5-declarative qt5-svg
   # Elephant (Walker's backend) ships each data source as a separate plugin
   # package - the base "elephant" package alone returns zero results for
-  # everything. Install only the providers our walker/config.toml actually
-  # wires up prefixes for (skips elephant-runner, unused here).
+  # everything.
   elephant-providerlist elephant-desktopapplications elephant-files
   elephant-calc elephant-websearch elephant-clipboard elephant-symbols
+  elephant-runner
 )
 
 log "Installing packages (pacman, falling back to yay/AUR per-package)..."

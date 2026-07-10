@@ -44,6 +44,10 @@ provider = "websearch"
 prefix = "$"
 provider = "clipboard"
 
+[[providers.prefixes]]
+prefix = ">"
+provider = "runner"
+
 [[emergencies]]
 text = "Restart Walker"
 command = "systemctl --user restart walker.service"
