@@ -124,7 +124,7 @@ binds {
     Ctrl+XF86Launch1 { screenshot-screen; }
     Print { screenshot; }
     XF86Launch1 { screenshot; }
-    Mod+Shift+E { quit skip-confirmation=true; }
+    Mod+Shift+E { quit; }
     Mod+Space hotkey-overlay-title="Open Application Launcher" { spawn "walker"; }
     Mod+Alt+Space hotkey-overlay-title="Open Cachy Menu" { spawn "cachy-menu"; }
     Super+B hotkey-overlay-title="Open Browser" { spawn "brave-origin"; }
