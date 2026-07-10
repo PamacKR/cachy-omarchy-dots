@@ -114,7 +114,7 @@ show_setup_default_browser_menu() {
   local options=""
   browser_desktop_exists chromium.desktop && options="$options  Chromium"
   browser_desktop_exists google-chrome.desktop && options="${options:+$options\n}󰊯  Chrome"
-  browser_desktop_exists brave-origin-beta.desktop && options="${options:+$options\n}󰖟  Brave Origin"
+  browser_desktop_exists brave-origin.desktop && options="${options:+$options\n}󰖟  Brave Origin"
   browser_desktop_exists brave-browser.desktop && options="${options:+$options\n}󰖟  Brave"
   browser_desktop_exists microsoft-edge.desktop && options="${options:+$options\n}󰇩  Edge"
   browser_desktop_exists firefox.desktop && options="${options:+$options\n}󰈹  Firefox"
