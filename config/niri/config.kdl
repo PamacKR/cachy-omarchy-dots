@@ -14,8 +14,10 @@ input {
         natural-scroll
     }
 
+    // Mouse natural-scroll is off by default in niri - no line needed to
+    // disable it (KDL flags are presence-based, "natural-scroll=false" isn't
+    // valid syntax and failed `niri validate`).
     mouse {
-        natural-scroll=false
     }
 }
 
