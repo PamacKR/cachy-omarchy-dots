@@ -11,6 +11,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 log() { echo -e "\n==> $*"; }
 
+# Prime sudo once and keep it alive for the whole script (build + DMS's own
+# installer can take a while, and a stale sudo timestamp partway through
+# looks like the script has hung).
+source "$SCRIPT_DIR/bin/cachy-sudo-keepalive"
+
 log "Installing base-devel + git (needed to build yay from the AUR)..."
 sudo pacman -S --needed --noconfirm base-devel git
 
