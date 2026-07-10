@@ -42,6 +42,9 @@ command -v yay >/dev/null 2>&1 || {
 
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd fastfetch tesseract tesseract-data-eng
+  # Lock screen. hyprlock isn't Hyprland-only - it also implements the
+  # ext-session-lock-v1 protocol, which niri supports.
+  hyprlock
   ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swayidle
   grim slurp wl-clipboard jq sddm plymouth qt5-declarative qt5-svg
   # Elephant (Walker's backend) ships each data source as a separate plugin
