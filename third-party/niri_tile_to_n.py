@@ -455,10 +455,6 @@ try:
             # diff it against our own state to catch any workspace_id change this event alone
             # doesn't tell us about, then apply the same arrival/departure logic by hand.
             if win_state is not None and APPLY_TO_MOVED_WINDOWS:
-                # Small settling delay: WorkspacesChanged appears to fire slightly before the
-                # compositor's own window-workspace assignment is queryable, so an immediate
-                # "Windows" request was returning stale data (no diff detected, no action).
-                sleep(0.05)
                 is_query_ok, query_resp = niri_query.request("Windows")
                 if is_query_ok:
                     fresh_windows_by_id = {w["id"]: w for w in query_resp["Windows"]}
