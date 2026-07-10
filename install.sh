@@ -40,8 +40,17 @@ command -v yay >/dev/null 2>&1 || {
   exit 1
 }
 
+# Prime sudo once and keep it alive for the whole script, so a long package
+# install loop (or anything else below) doesn't hit a re-prompt for your
+# password partway through and look like the script hung.
+source "$CACHY_DOTS_PATH/bin/cachy-sudo-keepalive"
+
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd fastfetch tesseract tesseract-data-eng
+  # Referenced directly by mimeapps.list/binds.kdl (editor, file manager,
+  # browser) - without these, a fresh install silently has broken defaults
+  # for opening files/directories/links until you notice and install by hand.
+  neovim nautilus brave-origin-bin zip unzip
   # Lock screen. hyprlock isn't Hyprland-only - it also implements the
   # ext-session-lock-v1 protocol, which niri supports.
   hyprlock
@@ -169,7 +178,7 @@ sudo mkdir -p /usr/share/plymouth/themes
 sudo rm -rf /usr/share/plymouth/themes/omarchy-look
 sudo cp -r "$CACHY_DOTS_PATH/plymouth/omarchy-look" /usr/share/plymouth/themes/omarchy-look
 sudo plymouth-set-default-theme omarchy-look
-sudo mkinitcpio -P 2>/dev/null || echo "note: re-run 'sudo mkinitcpio -P' manually if this distro uses mkinitcpio."
+sudo mkinitcpio -P </dev/null 2>/dev/null || echo "note: re-run 'sudo mkinitcpio -P' manually if this distro uses mkinitcpio."
 
 # --- Theme -----------------------------------------------------------------
 
