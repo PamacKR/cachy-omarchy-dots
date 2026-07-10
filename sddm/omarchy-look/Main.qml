@@ -7,7 +7,12 @@ Rectangle {
   height: 480
   color: "#1a1b26"
 
-  property string currentUser: userModel.lastUser !== "" ? userModel.lastUser : userModel.data(userModel.index(0, 0), Qt.DisplayRole)
+  // userModel.lastUser (and even userModel.data(userModel.index(0,0),...) as a
+  // fallback) came back blank on a machine that had never had a successful
+  // graphical login yet, silently authenticating as user "" no matter what
+  // password was typed. This is a single-user machine, so just hardcode it -
+  // change this if you ever add a second account.
+  property string currentUser: "pamac"
   property bool loginFailed: false
   property int sessionIndex: {
     for (var i = 0; i < sessionModel.rowCount(); i++) {
