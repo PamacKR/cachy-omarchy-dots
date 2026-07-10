@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Launch $EDITOR (falls back to nvim). TUI editors get wrapped in a floating
+# scratch terminal; GUI editors launch directly. Port of Omarchy's
+# omarchy-launch-editor, without the uwsm/Hyprland-specific plumbing.
+# Usage: launch-editor [path...]
+set -euo pipefail
+
+CACHY_DOTS_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+editor="${EDITOR:-nvim}"
+command -v "$editor" >/dev/null 2>&1 || editor=nvim
+
+case "$editor" in
+nvim | vim | nano | micro | hx | helix | fresh)
+  exec "$CACHY_DOTS_BIN/launch-tui" "$editor" "$@"
+  ;;
+*)
+  exec setsid "$editor" "$@"
+  ;;
+esac

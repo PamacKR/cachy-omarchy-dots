@@ -1,0 +1,6 @@
+[SddmGreeterTheme]
+Name=Omarchy Look
+Description=Minimal password-only login theme, no user list or session picker
+Author=Pamac
+Type=sddm-theme
+Version=1.0

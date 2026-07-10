@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Idle watcher: no dimming, no lock, no screensaver, ever. The only behavior
+# this provides is suspending after a few minutes of inactivity while on
+# battery power - AC power never triggers anything.
+set -euo pipefail
+
+CACHY_DOTS_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IDLE_SECONDS="${BATTERY_SUSPEND_IDLE_SECONDS:-300}"
+
+exec swayidle -w \
+  timeout "$IDLE_SECONDS" "$CACHY_DOTS_BIN/battery-suspend-trigger"

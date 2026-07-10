@@ -1,0 +1,14 @@
+[Unit]
+Description=DMS (Dank Material Shell) panel
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+# Adjust ExecStart once DMS is installed and its actual launch command/binary
+# name is known - this is a placeholder (see task: DMS panel config).
+ExecStart=/usr/bin/dms
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=graphical-session.target

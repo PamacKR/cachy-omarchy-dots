@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Regenerate per-app color fragments from a theme's colors.toml and restart consumers.
+# Mirrors Omarchy's omarchy-theme-set atomic-staging-dir approach, scoped to a smaller app set.
+#
+# Usage: theme-set.sh <theme-name>
+set -euo pipefail
+
+CACHY_DOTS_PATH="${CACHY_DOTS_PATH:-$HOME/.local/share/cachy-dots}"
+STATE_DIR="$HOME/.config/cachy-dots/current"
+
+theme_name="${1:?Usage: theme-set.sh <theme-name>}"
+theme_src="$CACHY_DOTS_PATH/themes/$theme_name"
+colors_toml="$theme_src/colors.toml"
+
+if [[ ! -f "$colors_toml" ]]; then
+  echo "error: no colors.toml found for theme '$theme_name' at $colors_toml" >&2
+  exit 1
+fi
+
+staging="$STATE_DIR/next-theme"
+rm -rf "$staging"
+mkdir -p "$staging"
+
+# Copy the theme's own static assets (backgrounds, any hand-authored overrides) first.
+cp -r "$theme_src"/. "$staging"/
+
+# Build a sed script from colors.toml: {{ key }}, {{ key_strip }} (no leading #), {{ key_rgb }} (r,g,b decimal).
+sed_script="$(mktemp)"
+trap 'rm -f "$sed_script"' EXIT
+
+while IFS='=' read -r key value; do
+  key="$(echo "$key" | xargs)"
+  value="$(echo "$value" | xargs | tr -d '"')"
+  [[ -z "$key" || "$key" == \#* ]] && continue
+
+  hex="${value#\#}"
+  r=$((16#${hex:0:2}))
+  g=$((16#${hex:2:2}))
+  b=$((16#${hex:4:2}))
+
+  {
+    echo "s/{{ *${key} *}}/${value}/g"
+    echo "s/{{ *${key}_strip *}}/${hex}/g"
+    echo "s/{{ *${key}_rgb *}}/${r}, ${g}, ${b}/g"
+  } >>"$sed_script"
+done < <(grep -E '^[a-zA-Z0-9_]+\s*=' "$colors_toml")
+
+# Stamp every template into the staging dir, dropping the .tpl suffix.
+for tpl in "$CACHY_DOTS_PATH"/theme-engine/templates/*.tpl; do
+  out_name="$(basename "$tpl" .tpl)"
+  # A theme-provided static file (copied above) wins over the generated one.
+  [[ -f "$staging/$out_name" ]] && continue
+  sed -f "$sed_script" "$tpl" >"$staging/$out_name"
+done
+
+# Atomic swap.
+mkdir -p "$STATE_DIR"
+rm -rf "$STATE_DIR/theme.old"
+[[ -d "$STATE_DIR/theme" ]] && mv "$STATE_DIR/theme" "$STATE_DIR/theme.old"
+mv "$staging" "$STATE_DIR/theme"
+rm -rf "$STATE_DIR/theme.old"
+echo "$theme_name" >"$STATE_DIR/theme.name"
+
+# Point the background symlink at the theme's first wallpaper, if any.
+first_bg="$(find "$STATE_DIR/theme/backgrounds" -maxdepth 1 -type f 2>/dev/null | sort | head -n1 || true)"
+if [[ -n "$first_bg" ]]; then
+  ln -sf "$first_bg" "$STATE_DIR/background"
+fi
+
+# Restart consumers so they pick up the new fragments. Alacritty/GTK apps just
+# read the fragment on next launch, so nothing to restart there.
+makoctl reload 2>/dev/null || systemctl --user restart mako.service 2>/dev/null || true
+systemctl --user restart walker.service 2>/dev/null || true
+systemctl --user restart dms.service 2>/dev/null || true
+pkill -x swaybg 2>/dev/null || true
+if [[ -n "$first_bg" ]] && command -v swaybg >/dev/null 2>&1; then
+  (setsid swaybg -i "$first_bg" -m fill &>/dev/null &) || true
+fi
+
+echo "Theme set to '$theme_name'."

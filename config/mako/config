@@ -1,0 +1,2 @@
+include=~/.local/share/cachy-dots/config/mako/core.ini
+include=~/.config/cachy-dots/current/theme/mako-colors.ini

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Launch an app, or focus its existing window if one matches app-id/title.
+# Port of Omarchy's omarchy-launch-or-focus, using `niri msg` instead of hyprctl.
+# Usage: launch-or-focus <window-pattern> [launch-command]
+set -euo pipefail
+
+[[ $# -ge 1 ]] || { echo "Usage: launch-or-focus <window-pattern> [launch-command]" >&2; exit 1; }
+
+pattern="$1"
+launch_command="${2:-$1}"
+
+window_id="$(
+  niri msg -j windows |
+    jq -r --arg p "$pattern" \
+      '.[] | select((.app_id // "" | test($p; "i")) or (.title // "" | test($p; "i"))) | .id' |
+    head -n1
+)"
+
+if [[ -n "$window_id" ]]; then
+  niri msg action focus-window --id "$window_id"
+else
+  eval exec setsid "$launch_command"
+fi

@@ -1,0 +1,77 @@
+// Niri config for the "omarchy-look" setup.
+//
+// Keybinds are intentionally left minimal here — configure them through DMS's
+// own settings panel instead. Only a couple of safety-net binds are kept so
+// you're never locked out of a session even before DMS keybinds are set up.
+
+input {
+    keyboard {
+        xkb {}
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+    }
+
+    mouse {
+        natural-scroll=false
+    }
+}
+
+layout {
+    gaps 8
+
+    focus-ring {
+        off
+    }
+
+    border {
+        width 2
+    }
+
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+
+    default-column-width {
+        proportion 0.5
+    }
+}
+
+cursor {
+    xcursor-theme "Breeze"
+    xcursor-size 24
+}
+
+// Companions that make up the rest of the "Omarchy look": launcher,
+// notifications, OSD, polkit agent, wallpaper. DMS itself is started the same
+// way (or via its own systemd unit if it ships one) — see systemd/user/*.service
+// for the more robust restart-on-crash equivalents of these.
+spawn-at-startup "systemctl" "--user" "start" "walker.service"
+spawn-at-startup "systemctl" "--user" "start" "mako.service"
+spawn-at-startup "systemctl" "--user" "start" "dms.service"
+spawn-at-startup "systemctl" "--user" "start" "swayosd.service"
+spawn-at-startup "systemctl" "--user" "start" "polkit-agent.service"
+spawn-at-startup "systemctl" "--user" "start" "battery-suspend-watch.service"
+spawn-at-startup "swaybg" "-i" "~/.config/cachy-dots/current/background" "-m" "fill"
+
+window-rule {
+    // Keep launcher/picker style popups floating and centered.
+    match app-id="^walker$"
+    open-floating true
+}
+
+window-rule {
+    // The scratch terminal launch-tui/launch-editor spawn for TUI editors etc.
+    match app-id="^cachy-dots-scratch-term$"
+    open-floating true
+    default-column-width { proportion 0.6; }
+}
+
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Shift+E { quit; }
+}

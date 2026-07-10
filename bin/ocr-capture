@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Select a screen region and OCR the text in it to the clipboard.
+# Port of Omarchy's omarchy-capture-text-extraction, without the Hyprland-only
+# hyprpicker freeze-overlay trick (grim+slurp work directly under Niri).
+set -euo pipefail
+
+selection="$(slurp 2>/dev/null || true)"
+[[ -z "$selection" ]] && exit 0
+
+text="$(grim -g "$selection" - | tesseract stdin stdout --oem 1 --psm 6 -l "${OCR_LANGS:-eng}" --dpi 300 -c preserve_interword_spaces=1 2>/dev/null)" || exit 1
+[[ -z "$text" ]] && exit 1
+
+printf "%s" "$text" | wl-copy
+notify-send "Copied text from selection to clipboard"
