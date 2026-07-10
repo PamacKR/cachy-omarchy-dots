@@ -50,71 +50,75 @@ Rectangle {
       anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    Row {
+    // Only this wrapper is centered (same center line as the "PAMAC" text
+    // above) - the lock icon hangs off its left edge instead of being part
+    // of the centered group, so it doesn't pull the password box off-center.
+    Item {
+      id: entryWrapper
       anchors.horizontalCenter: parent.horizontalCenter
-      spacing: 15
+      width: entry.width
+      height: entry.height
 
+      Image {
+        id: entry
+        source: root.loginFailed ? "entry-failed.png" : "entry.png"
+        anchors.centerIn: parent
+      }
+
+      Row {
+        anchors.left: parent.left
+        anchors.leftMargin: 20
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 5
+
+        Repeater {
+          model: Math.min(password.text.length, 21)
+
+          Image {
+            source: "bullet.png"
+            width: 7
+            height: 7
+          }
+        }
+      }
+
+      TextInput {
+        id: password
+        anchors.fill: parent
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
+        verticalAlignment: TextInput.AlignVCenter
+        echoMode: TextInput.Password
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: 24
+        font.letterSpacing: 5
+        passwordCharacter: "•"
+        color: "transparent"
+        selectionColor: "transparent"
+        selectedTextColor: "transparent"
+        cursorDelegate: Item {}
+        focus: true
+
+        onTextChanged: root.loginFailed = false
+
+        Keys.onPressed: {
+          if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            sddm.login(root.currentUser, password.text, root.sessionIndex)
+            event.accepted = true
+          }
+        }
+      }
+
+      // Positioned outside entryWrapper's own bounds (QML doesn't clip
+      // children by default), so it doesn't affect entryWrapper's centering.
       Image {
         source: root.loginFailed ? "lock-failed.png" : "lock.png"
         width: 34
         height: 38
         fillMode: Image.PreserveAspectFit
+        anchors.right: parent.left
+        anchors.rightMargin: 15
         anchors.verticalCenter: parent.verticalCenter
-      }
-
-      Item {
-        width: entry.width
-        height: entry.height
-
-        Image {
-          id: entry
-          source: root.loginFailed ? "entry-failed.png" : "entry.png"
-          anchors.centerIn: parent
-        }
-
-        Row {
-          anchors.left: parent.left
-          anchors.leftMargin: 20
-          anchors.verticalCenter: parent.verticalCenter
-          spacing: 5
-
-          Repeater {
-            model: Math.min(password.text.length, 21)
-
-            Image {
-              source: "bullet.png"
-              width: 7
-              height: 7
-            }
-          }
-        }
-
-        TextInput {
-          id: password
-          anchors.fill: parent
-          anchors.leftMargin: 20
-          anchors.rightMargin: 20
-          verticalAlignment: TextInput.AlignVCenter
-          echoMode: TextInput.Password
-          font.family: "JetBrainsMono Nerd Font"
-          font.pixelSize: 24
-          font.letterSpacing: 5
-          passwordCharacter: "•"
-          color: "transparent"
-          selectionColor: "transparent"
-          selectedTextColor: "transparent"
-          cursorDelegate: Item {}
-          focus: true
-
-          onTextChanged: root.loginFailed = false
-
-          Keys.onPressed: {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-              sddm.login(root.currentUser, password.text, root.sessionIndex)
-              event.accepted = true
-            }
-          }
-        }
       }
     }
 
