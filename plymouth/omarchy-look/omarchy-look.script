@@ -1,19 +1,14 @@
 # Plymouth boot theme script, ported from Omarchy's, with the logo replaced
-# by a plain "PAMAC" text placeholder (no Omarchy branding).
+# by a plain "CachyOS" text placeholder (no Omarchy branding).
 
 Window.SetBackgroundTopColor(0.101, 0.105, 0.149);
 Window.SetBackgroundBottomColor(0.101, 0.105, 0.149);
 
-# Bold, and shifted up from dead-center by roughly the height of the
-# password row + spacing that appears below it in the SDDM theme (Main.qml's
-# Column: ~48px text + 40px spacing + ~60px row), so the boot splash's logo
-# sits where SDDM's logo will end up, and the box seems to "appear" under it
-# rather than the whole group jumping position. Approximate - eyeball it live
-# and adjust the "- 50" below if it looks off.
-logo.image = Image.Text("PAMAC", 0.663, 0.694, 0.839, 1, "JetBrainsMono Nerd Font Bold");
+# Bold and larger, dead-centered.
+logo.image = Image.Text("CachyOS", 0.663, 0.694, 0.839, 1, "JetBrainsMono Nerd Font Bold 48");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 50);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
 logo.sprite.SetOpacity(1);
 
 # Use these to adjust the progress bar timing
