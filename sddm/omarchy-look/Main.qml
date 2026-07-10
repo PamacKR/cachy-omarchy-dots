@@ -51,10 +51,19 @@ Rectangle {
       text: "PAMAC"
       font.bold: true
       font.family: "JetBrainsMono Nerd Font"
-      font.pixelSize: 40
-      font.letterSpacing: 6
+      font.letterSpacing: 4
       color: "#a9b1d6"
+      horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
+
+      // Auto-scale to exactly fill the password box's width instead of a
+      // guessed pixelSize - font.pixelSize below is just a ceiling Qt shrinks
+      // down from; fontSizeMode does the actual fitting against entryWrapper's
+      // width, so it stays correct even if the entry art's size ever changes.
+      width: entryWrapper.width
+      fontSizeMode: Text.HorizontalFit
+      font.pixelSize: 200
+      minimumPixelSize: 10
     }
 
     // Only this wrapper is centered (same center line as the "PAMAC" text
