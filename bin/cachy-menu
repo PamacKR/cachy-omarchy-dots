@@ -268,7 +268,7 @@ show_system_menu() {
   *Lock*) hyprlock ;;
   *Suspend*) systemctl suspend ;;
   *Hibernate*) systemctl hibernate ;;
-  *Logout*) niri msg action quit ;;
+  *Logout*) niri msg action quit --skip-confirmation ;;
   *Restart*) systemctl reboot ;;
   *Shutdown*) systemctl poweroff ;;
   *) back_to show_main_menu ;;
