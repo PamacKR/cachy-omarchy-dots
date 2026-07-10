@@ -42,6 +42,10 @@ command -v yay >/dev/null 2>&1 || {
 
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd fastfetch tesseract tesseract-data-eng
+  # Referenced directly by mimeapps.list/binds.kdl (editor, file manager,
+  # browser) - without these, a fresh install silently has broken defaults
+  # for opening files/directories/links until you notice and install by hand.
+  neovim nautilus brave-origin-bin
   # Lock screen. hyprlock isn't Hyprland-only - it also implements the
   # ext-session-lock-v1 protocol, which niri supports.
   hyprlock
