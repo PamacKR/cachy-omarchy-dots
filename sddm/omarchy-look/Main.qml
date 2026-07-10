@@ -114,6 +114,12 @@ Rectangle {
 
         Keys.onPressed: {
           if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            // Show the loading bar immediately, before the (async) login
+            // result comes back - sddm.login() replies via onLoginSucceeded/
+            // onLoginFailed, and by the time that round-trip completes SDDM
+            // may already be tearing the greeter down, leaving no frame left
+            // to render a state change triggered from the signal handler.
+            root.loggingIn = true
             sddm.login(root.currentUser, password.text, root.sessionIndex)
             event.accepted = true
           }

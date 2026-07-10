@@ -10,11 +10,11 @@ Window.SetBackgroundBottomColor(0.101, 0.105, 0.149);
 # instead of always saying "CachyOS" (which only makes sense while booting).
 global.plymouth_mode = Plymouth.GetMode();
 if (global.plymouth_mode == "shutdown") {
-  global.logo_text = "Shutting Down";
+  global.logo_text = "Shutting Down...";
 } else if (global.plymouth_mode == "reboot") {
-  global.logo_text = "Restarting";
+  global.logo_text = "Restarting...";
 } else if (global.plymouth_mode == "suspend") {
-  global.logo_text = "Suspending";
+  global.logo_text = "Suspending...";
 } else {
   global.logo_text = "CachyOS";
 }
