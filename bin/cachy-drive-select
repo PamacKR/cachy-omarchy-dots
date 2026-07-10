@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Select a LUKS-encrypted drive from a list. Used by cachy-drive-password.
+set -euo pipefail
+
+drives="${*:-$(blkid -t TYPE=crypto_LUKS -o device)}"
+
+selected_drive="$(printf "%s\n" "$drives" | gum choose --header "Select drive")" || exit 1
+echo "$selected_drive"

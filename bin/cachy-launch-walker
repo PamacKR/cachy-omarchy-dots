@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Launch Walker (elephant + walker are already kept running via systemd user
+# services, so this just execs walker with whatever args the caller needs -
+# e.g. --dmenu for the cachy-menu's picker screens).
+set -euo pipefail
+
+if ! systemctl --user --quiet is-active elephant.service; then
+  systemctl --user start elephant.service
+fi
+
+exec walker "$@"

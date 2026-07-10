@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+makoctl reload 2>/dev/null || systemctl --user restart mako.service

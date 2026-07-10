@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Check whether any of the given commands are missing. Exit 0 if any are missing.
+for cmd in "$@"; do
+  command -v "$cmd" &>/dev/null || exit 0
+done
+exit 1

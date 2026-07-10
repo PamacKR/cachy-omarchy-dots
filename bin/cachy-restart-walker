@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+systemctl --user restart elephant.service
+systemctl --user restart walker.service

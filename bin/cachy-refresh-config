@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Discard local edits to a config this repo tracks, restoring the version
+# checked into cachy-omarchy-dots, then restart whatever consumes it.
+#
+# Unlike Omarchy (which copies static defaults into a separate, mutable
+# ~/.config), our install.sh symlinks ~/.config/<app> straight at the repo, so
+# editing the live config *is* editing the repo file. "Refresh" here means
+# `git checkout` on that path instead of re-copying a separate default.
+#
+# Usage: cachy-refresh-config <repo-relative-config-path> [restart-command...]
+set -euo pipefail
+
+CACHY_DOTS_PATH="${CACHY_DOTS_PATH:-$HOME/.local/share/cachy-dots}"
+rel_path="${1:?Usage: cachy-refresh-config <repo-relative-path> [restart-command...]}"
+shift
+
+git -C "$CACHY_DOTS_PATH" checkout -- "$rel_path"
+echo "Restored $rel_path to the version in the repo."
+
+if (($# > 0)); then
+  "$@"
+fi

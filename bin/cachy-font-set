@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Set the system monospace font (Alacritty, GTK apps, mako, swayosd).
+# Usage: cachy-font-set <font-name>
+set -euo pipefail
+
+font_name="${1:-}"
+[[ -n $font_name ]] || { echo "Usage: cachy-font-set <font-name>"; exit 1; }
+
+if ! fc-list | grep -iq "$font_name"; then
+  echo "Font '$font_name' not found." >&2
+  exit 1
+fi
+
+[[ -f ~/.config/alacritty/alacritty.toml ]] &&
+  sed -i "s/family = \".*\"/family = \"$font_name\"/g" ~/.config/alacritty/alacritty.toml
+
+for f in ~/.config/gtk-3.0/settings.ini ~/.config/gtk-4.0/settings.ini; do
+  [[ -f $f ]] && sed -i "s/^gtk-font-name=.*/gtk-font-name=$font_name 10/" "$f"
+done
+
+[[ -f ~/.config/mako/core.ini ]] &&
+  sed -i "s/^font=.*/font=$font_name 14px/" ~/.config/mako/core.ini
+
+[[ -f ~/.config/swayosd/style.css ]] &&
+  sed -i "s/font-family: '.*';/font-family: '$font_name';/" ~/.config/swayosd/style.css
+
+makoctl reload 2>/dev/null || systemctl --user restart mako.service 2>/dev/null || true
+systemctl --user restart swayosd.service 2>/dev/null || true
+
+notify-send -u low "   $font_name is now the system monospace font" \
+  "      New Alacritty windows and restarted apps will pick it up. Set the DMS panel font separately in DMS's own Settings."

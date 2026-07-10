@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo -e "Restarting PipeWire audio services...\n"
+systemctl --user restart wireplumber.service pipewire.service
+systemctl --user --quiet is-active pipewire-pulse.service && systemctl --user restart pipewire-pulse.service
+exit 0

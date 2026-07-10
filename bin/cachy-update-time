@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Restart system time synchronization.
+set -euo pipefail
+echo "Updating time..."
+sudo systemctl restart systemd-timesyncd

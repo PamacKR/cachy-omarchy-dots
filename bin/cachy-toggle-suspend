@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Toggle whether "Suspend" shows up in the System menu.
+set -euo pipefail
+cachy-toggle \
+  --enabled-notification "Suspend removed from system menu" \
+  --disabled-notification "Suspend now available in system menu" \
+  suspend-off

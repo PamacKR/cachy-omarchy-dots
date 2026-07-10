@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Get/set $EDITOR, persisted via systemd user environment.d.
+# Usage: cachy-default-editor [code|cursor|zed|sublime_text|helix|vim|emacs|nvim]
+set -euo pipefail
+
+CONF="$HOME/.config/environment.d/editor.conf"
+
+if (($# == 0)); then
+  sed -n 's/^EDITOR=//p' "$CONF" 2>/dev/null | head -n1
+  exit 0
+fi
+
+case "$1" in
+code) editor="code"; name="VSCode" ;;
+cursor) editor="cursor"; name="Cursor" ;;
+zed | zeditor) editor="zeditor"; name="Zed" ;;
+sublime_text) editor="sublime_text"; name="Sublime Text" ;;
+helix) editor="helix"; name="Helix" ;;
+vim) editor="vim"; name="Vim" ;;
+emacs) editor="emacs"; name="Emacs" ;;
+nvim) editor="nvim"; name="Neovim" ;;
+*)
+  echo "Usage: cachy-default-editor <code|cursor|zed|sublime_text|helix|vim|emacs|nvim>" >&2
+  exit 1
+  ;;
+esac
+
+mkdir -p "$(dirname "$CONF")"
+echo "EDITOR=$editor" >"$CONF"
+export EDITOR="$editor"
+
+notify-send -u low "$name is now the default editor" "      Effective after logging out"

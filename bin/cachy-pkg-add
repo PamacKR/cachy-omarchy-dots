@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Install packages if missing, trying pacman first and falling back to yay/AUR.
+# Usage: cachy-pkg-add <packages...>
+set -euo pipefail
+
+for pkg in "$@"; do
+  pacman -Q "$pkg" &>/dev/null && continue
+
+  if pacman -Si "$pkg" &>/dev/null; then
+    sudo pacman -S --noconfirm --needed "$pkg"
+  elif command -v yay &>/dev/null && yay -Si "$pkg" &>/dev/null; then
+    yay -S --noconfirm --needed "$pkg"
+  else
+    echo "error: package '$pkg' not found in official repos or AUR" >&2
+    exit 1
+  fi
+
+  pacman -Q "$pkg" &>/dev/null || { echo "error: '$pkg' did not install" >&2; exit 1; }
+done

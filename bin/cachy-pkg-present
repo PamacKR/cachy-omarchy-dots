@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Exit 0 if all given packages are installed, exit 1 otherwise.
+for pkg in "$@"; do
+  pacman -Q "$pkg" &>/dev/null || exit 1
+done
+exit 0

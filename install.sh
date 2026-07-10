@@ -50,6 +50,8 @@ PACKAGES=(
   elephant-providerlist elephant-desktopapplications elephant-files
   elephant-calc elephant-websearch elephant-clipboard elephant-symbols
   elephant-runner
+  # cachy-menu (Super+Alt+Space) and the Setup/Update submenus it opens.
+  fzf gum curl pavucontrol nm-connection-editor blueman power-profiles-daemon fwupd
 )
 
 log "Installing packages (pacman, falling back to yay/AUR per-package)..."
@@ -87,6 +89,30 @@ for entry in "$CACHY_DOTS_PATH"/config/*; do
 done
 
 ln -sf "$CACHY_DOTS_PATH/config/mimeapps.list" "$HOME/.config/mimeapps.list"
+
+log "Symlinking bin/* onto PATH via ~/.local/bin..."
+mkdir -p "$HOME/.local/bin"
+chmod +x "$CACHY_DOTS_PATH/theme-engine/theme-set.sh" "$CACHY_DOTS_PATH"/bin/*
+for script in "$CACHY_DOTS_PATH"/bin/*; do
+  ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
+done
+
+# So cachy-menu, cachy-pkg-install, install-web-apps etc. resolve for the rest
+# of this script too, not just future shells.
+export PATH="$HOME/.local/bin:$PATH"
+
+# --- Web app installer (PamacKR/Web-Apps) -------------------------------------
+
+log "Installing the web app installer (install-web-apps/uninstall-web-apps)..."
+WEBAPPS_SRC="$HOME/.local/share/web-apps-src"
+if [[ -d $WEBAPPS_SRC/.git ]]; then
+  git -C "$WEBAPPS_SRC" pull --ff-only
+else
+  rm -rf "$WEBAPPS_SRC"
+  git clone https://github.com/PamacKR/Web-Apps.git "$WEBAPPS_SRC"
+fi
+chmod +x "$WEBAPPS_SRC/install.sh"
+"$WEBAPPS_SRC/install.sh"
 
 # --- File associations -------------------------------------------------------
 
@@ -133,7 +159,6 @@ sudo mkinitcpio -P 2>/dev/null || echo "note: re-run 'sudo mkinitcpio -P' manual
 # --- Theme -----------------------------------------------------------------
 
 log "Applying tokyo-night theme..."
-chmod +x "$CACHY_DOTS_PATH/theme-engine/theme-set.sh" "$CACHY_DOTS_PATH"/bin/*
 "$CACHY_DOTS_PATH/theme-engine/theme-set.sh" tokyo-night
 
 log "Done. Log out and back in (or reboot) to pick up the new SDDM/Plymouth themes."

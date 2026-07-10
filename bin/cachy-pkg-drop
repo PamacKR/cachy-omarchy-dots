@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Remove the given packages if installed (ignore ones that aren't).
+# Usage: cachy-pkg-drop <packages...>
+set -euo pipefail
+
+installed=()
+for pkg in "$@"; do
+  pacman -Q "$pkg" &>/dev/null && installed+=("$pkg")
+done
+
+((${#installed[@]} > 0)) && sudo pacman -Rns --noconfirm "${installed[@]}"

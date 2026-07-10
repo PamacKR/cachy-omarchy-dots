@@ -126,6 +126,7 @@ binds {
     XF86Launch1 { screenshot; }
     Mod+Shift+E { quit; }
     Mod+Space hotkey-overlay-title="Open Application Launcher" { spawn "walker"; }
+    Mod+Alt+Space hotkey-overlay-title="Open Cachy Menu" { spawn "cachy-menu"; }
     Super+B hotkey-overlay-title="Open Browser" { spawn "chromium"; }
     Super+E hotkey-overlay-title="Open File Manager" { spawn "nautilus"; }
     Super+Return hotkey-overlay-title="Open Terminal" { spawn "alacritty"; }

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Exit 0 if hibernation looks usable (enough swap for the current RAM size).
+# Read-only check only - this repo doesn't set up hibernation/bootloader resume
+# config for you, since that's bootloader-specific (Limine vs GRUB vs systemd-boot)
+# and too risky to script blindly. Set it up yourself if you want it, then this
+# just lets the System menu show a "Hibernate" entry.
+set -euo pipefail
+
+[[ -f /sys/power/image_size ]] || exit 1
+
+SWAPSIZE_KB=$(awk '!/Filename|zram/ {sum += $3} END {print sum+0}' /proc/swaps)
+SWAPSIZE=$((1024 * ${SWAPSIZE_KB:-0}))
+MEMSIZE_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+MEMSIZE=$((1024 * ${MEMSIZE_KB:-0}))
+
+((SWAPSIZE > MEMSIZE))

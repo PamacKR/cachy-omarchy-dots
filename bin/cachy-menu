@@ -1,0 +1,358 @@
+#!/usr/bin/env bash
+# The Cachy menu - a walker-dmenu-driven "everything" menu, in the spirit of
+# Omarchy's omarchy-menu, trimmed to what this repo actually manages: Niri +
+# DMS + Walker + mako + swayosd, no Hyprland, no screensaver, and an
+# Install/Remove menu scoped to just Package/AUR/Web App.
+#
+# Bound to Super+Alt+Space (see config/niri/dms/binds.kdl).
+set -uo pipefail
+
+CACHY_DOTS_PATH="${CACHY_DOTS_PATH:-$HOME/.local/share/cachy-dots}"
+BACK_TO_EXIT=false
+
+back_to() {
+  local parent_menu="$1"
+  if [[ $BACK_TO_EXIT == "true" ]]; then
+    exit 0
+  elif [[ -n $parent_menu ]]; then
+    "$parent_menu"
+  else
+    show_main_menu
+  fi
+}
+
+toggle_existing_menu() {
+  if pgrep -f "walker.*--dmenu" >/dev/null; then
+    walker --close >/dev/null 2>&1
+    exit 0
+  fi
+}
+
+menu() {
+  local prompt="$1" options="$2" extra="${3:-}" preselect="${4:-}"
+  local args=()
+  read -r -a args <<<"$extra"
+
+  if [[ -n $preselect ]]; then
+    local index
+    index=$(echo -e "$options" | grep -nxF "$preselect" | cut -d: -f1)
+    [[ -n $index ]] && args+=("-c" "$index")
+  fi
+
+  echo -e "$options" | cachy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null
+}
+
+terminal() {
+  exec setsid alacritty -e "$@"
+}
+
+present_terminal() {
+  launch-tui bash -c "$1"
+}
+
+open_in_editor() {
+  notify-send -u low "Editing config file" "$1"
+  launch-editor "$1"
+}
+
+show_install_menu() {
+  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App") in
+  *Package*) terminal cachy-pkg-install ;;
+  *AUR*) terminal cachy-pkg-aur-install ;;
+  *Web*) present_terminal "install-web-apps" ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_remove_menu() {
+  case $(menu "Remove" "󰣇  Package\n  Web App\n  AUR") in
+  *Package*) terminal cachy-pkg-remove ;;
+  *Web*) present_terminal "uninstall-web-apps" ;;
+  *AUR*) terminal cachy-pkg-remove ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_style_menu() {
+  case $(menu "Style" "󰸌  Theme\n  Font\n  Background") in
+  *Theme*) show_style_theme_menu ;;
+  *Font*) show_style_font_menu ;;
+  *Background*) dms ipc call dankdash wallpaper ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_style_theme_menu() {
+  local options current
+  options="$(for d in "$CACHY_DOTS_PATH"/themes/*/; do basename "$d"; done)"
+  current="$(cat "$HOME/.config/cachy-dots/current/theme.name" 2>/dev/null || true)"
+
+  local theme
+  theme=$(menu "Theme" "$options" "" "$current")
+  if [[ -n $theme ]]; then
+    "$CACHY_DOTS_PATH/theme-engine/theme-set.sh" "$theme"
+  else
+    back_to show_style_menu
+  fi
+}
+
+show_style_font_menu() {
+  local font
+  font=$(menu "Font" "$(cachy-font-list)" "--width 350" "$(cachy-font-current)")
+  if [[ -n $font ]]; then
+    cachy-font-set "$font"
+  else
+    back_to show_style_menu
+  fi
+}
+
+browser_desktop_exists() {
+  [[ -f ~/.local/share/applications/$1 || -f /usr/share/applications/$1 ]]
+}
+
+show_setup_default_browser_menu() {
+  local options=""
+  browser_desktop_exists chromium.desktop && options="$options  Chromium"
+  browser_desktop_exists google-chrome.desktop && options="${options:+$options\n}󰊯  Chrome"
+  browser_desktop_exists brave-browser.desktop && options="${options:+$options\n}󰖟  Brave"
+  browser_desktop_exists microsoft-edge.desktop && options="${options:+$options\n}󰇩  Edge"
+  browser_desktop_exists firefox.desktop && options="${options:+$options\n}󰈹  Firefox"
+  browser_desktop_exists zen.desktop && options="${options:+$options\n}󰖟  Zen"
+
+  local current=""
+  case "$(cachy-default-browser)" in
+  chromium) current="  Chromium" ;;
+  chrome) current="󰊯  Chrome" ;;
+  brave) current="󰖟  Brave" ;;
+  edge) current="󰇩  Edge" ;;
+  firefox) current="󰈹  Firefox" ;;
+  zen) current="󰖟  Zen" ;;
+  esac
+
+  case $(menu "Default Browser" "$options" "" "$current") in
+  *Chromium*) cachy-default-browser chromium ;;
+  *Chrome*) cachy-default-browser chrome ;;
+  *Brave*) cachy-default-browser brave ;;
+  *Edge*) cachy-default-browser edge ;;
+  *Firefox*) cachy-default-browser firefox ;;
+  *Zen*) cachy-default-browser zen ;;
+  *) show_setup_default_menu ;;
+  esac
+}
+
+show_setup_default_terminal_menu() {
+  local options=""
+  cachy-cmd-present alacritty && options="$options  Alacritty"
+  cachy-cmd-present foot && options="${options:+$options\n}  Foot"
+  cachy-cmd-present ghostty && options="${options:+$options\n}  Ghostty"
+  cachy-cmd-present kitty && options="${options:+$options\n}  Kitty"
+
+  local current=""
+  case "$(cachy-default-terminal)" in
+  alacritty) current="  Alacritty" ;;
+  foot) current="  Foot" ;;
+  ghostty) current="  Ghostty" ;;
+  kitty) current="  Kitty" ;;
+  esac
+
+  case $(menu "Default Terminal" "$options" "" "$current") in
+  *Alacritty*) cachy-default-terminal alacritty ;;
+  *Foot*) cachy-default-terminal foot ;;
+  *Ghostty*) cachy-default-terminal ghostty ;;
+  *Kitty*) cachy-default-terminal kitty ;;
+  *) show_setup_default_menu ;;
+  esac
+}
+
+show_setup_default_editor_menu() {
+  local options=""
+  cachy-cmd-present nvim && options="$options  Neovim"
+  cachy-cmd-present code && options="${options:+$options\n}  VSCode"
+  cachy-cmd-present zeditor && options="${options:+$options\n}  Zed"
+  cachy-cmd-present helix && options="${options:+$options\n}  Helix"
+  cachy-cmd-present vim && options="${options:+$options\n}  Vim"
+  cachy-cmd-present emacs && options="${options:+$options\n}  Emacs"
+
+  local current=""
+  case "$(cachy-default-editor)" in
+  nvim) current="  Neovim" ;;
+  code) current="  VSCode" ;;
+  zed | zeditor) current="  Zed" ;;
+  helix) current="  Helix" ;;
+  vim) current="  Vim" ;;
+  emacs) current="  Emacs" ;;
+  esac
+
+  case $(menu "Default Editor" "$options" "" "$current") in
+  *Neovim*) cachy-default-editor nvim ;;
+  *VSCode*) cachy-default-editor code ;;
+  *Zed*) cachy-default-editor zed ;;
+  *Helix*) cachy-default-editor helix ;;
+  *Vim*) cachy-default-editor vim ;;
+  *Emacs*) cachy-default-editor emacs ;;
+  *) show_setup_default_menu ;;
+  esac
+}
+
+show_setup_default_menu() {
+  case $(menu "Default" "  Browser\n  Terminal\n  Editor") in
+  *Browser*) show_setup_default_browser_menu ;;
+  *Terminal*) show_setup_default_terminal_menu ;;
+  *Editor*) show_setup_default_editor_menu ;;
+  *) show_setup_menu ;;
+  esac
+}
+
+show_setup_security_menu() {
+  case $(menu "Setup" "󰈷  Fingerprint\n  Fido2") in
+  *Fingerprint*) present_terminal cachy-setup-security-fingerprint ;;
+  *Fido2*) present_terminal cachy-setup-security-fido2 ;;
+  *) show_setup_menu ;;
+  esac
+}
+
+show_setup_config_menu() {
+  case $(menu "Setup" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
+  *Niri*) open_in_editor ~/.config/niri/config.kdl ;;
+  *Keybinds*) open_in_editor ~/.config/niri/dms/binds.kdl ;;
+  *Plymouth*) open_in_editor "$CACHY_DOTS_PATH/plymouth/omarchy-look/omarchy-look.script" ;;
+  *Swayosd*) open_in_editor ~/.config/swayosd/config.toml && cachy-restart-swayosd ;;
+  *Walker*) open_in_editor ~/.config/walker/config.toml && cachy-restart-walker ;;
+  *Mako*) open_in_editor ~/.config/mako/core.ini && cachy-restart-mako ;;
+  *) show_setup_menu ;;
+  esac
+}
+
+show_setup_power_menu() {
+  local profile
+  profile=$(menu "Power Profile" "$(powerprofilesctl list | awk '/^\s*[* ]\s*[a-zA-Z0-9\-]+:$/ { gsub(/^[*[:space:]]+|:$/,""); print }')" "" "$(powerprofilesctl get)")
+  if [[ -n $profile ]]; then
+    powerprofilesctl set "$profile"
+  else
+    back_to show_setup_menu
+  fi
+}
+
+show_setup_menu() {
+  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰒲  Suspend\n󰍹  Displays\n  Config\n  Defaults\n󰱔  DNS\n  Security"
+
+  case $(menu "Setup" "$options") in
+  *Audio*) launch-or-focus "pavucontrol" "setsid pavucontrol" ;;
+  *Wifi*) launch-or-focus "nm-connection-editor" "setsid nm-connection-editor" ;;
+  *Bluetooth*) launch-or-focus "blueman-manager" "setsid blueman-manager" ;;
+  *Power*) show_setup_power_menu ;;
+  *Suspend*) cachy-toggle-suspend ;;
+  *Displays*) dms ipc call settings focusOrToggle ;;
+  *Config*) show_setup_config_menu ;;
+  *Defaults*) show_setup_default_menu ;;
+  *DNS*) present_terminal cachy-setup-dns ;;
+  *Security*) show_setup_security_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_update_process_menu() {
+  case $(menu "Restart" "󰎟  Mako\n  Swayosd\n󰌧  Walker\n  DMS") in
+  *Mako*) cachy-restart-mako ;;
+  *Swayosd*) cachy-restart-swayosd ;;
+  *Walker*) cachy-restart-walker ;;
+  *DMS*) cachy-restart-dms ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_config_menu() {
+  case $(menu "Restore default" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
+  *Niri*) present_terminal "cachy-refresh-config config/niri/config.kdl" ;;
+  *Keybinds*) present_terminal "cachy-refresh-config config/niri/dms/binds.kdl" ;;
+  *Plymouth*) present_terminal "cachy-refresh-config plymouth/omarchy-look/omarchy-look.script" ;;
+  *Swayosd*) present_terminal "cachy-refresh-config config/swayosd/config.toml cachy-restart-swayosd" ;;
+  *Walker*) present_terminal "cachy-refresh-config config/walker/config.toml cachy-restart-walker" ;;
+  *Mako*) present_terminal "cachy-refresh-config config/mako/core.ini cachy-restart-mako" ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_hardware_menu() {
+  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
+  *Audio*) present_terminal cachy-restart-pipewire ;;
+  *Wi-Fi*) present_terminal cachy-restart-wifi ;;
+  *Bluetooth*) present_terminal cachy-restart-bluetooth ;;
+  *Trackpad*) present_terminal cachy-restart-trackpad ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_password_menu() {
+  case $(menu "Update Password" "  Drive Encryption\n  User") in
+  *Drive*) present_terminal cachy-drive-password ;;
+  *User*) present_terminal passwd ;;
+  *) show_update_menu ;;
+  esac
+}
+
+show_update_menu() {
+  case $(menu "Update" "  Config\n  Process\n󰇅  Hardware\n  Firmware\n  Password\n  Timezone\n  Time") in
+  *Config*) show_update_config_menu ;;
+  *Process*) show_update_process_menu ;;
+  *Hardware*) show_update_hardware_menu ;;
+  *Firmware*) present_terminal "sudo fwupdmgr refresh --force && sudo fwupdmgr update" ;;
+  *Timezone*) present_terminal cachy-tz-select ;;
+  *Time*) present_terminal cachy-update-time ;;
+  *Password*) show_update_password_menu ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_about() {
+  launch-tui bash -c 'fastfetch; read -n 1 -s'
+}
+
+show_system_menu() {
+  local options="󰟵  Lock"
+  cachy-toggle-enabled suspend-off || options="$options\n󰒲  Suspend"
+  cachy-hibernation-available && options="$options\n󰤁  Hibernate"
+  options="$options\n󰍃  Logout\n󰜉  Restart\n󰐥  Shutdown"
+
+  case $(menu "System" "$options") in
+  *Lock*) dms ipc call lock lock ;;
+  *Suspend*) systemctl suspend ;;
+  *Hibernate*) systemctl hibernate ;;
+  *Logout*) niri msg action quit ;;
+  *Restart*) systemctl reboot ;;
+  *Shutdown*) systemctl poweroff ;;
+  *) back_to show_main_menu ;;
+  esac
+}
+
+show_main_menu() {
+  go_to_menu "$(menu "Go" "󰀻  Apps\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  About\n  System")"
+}
+
+go_to_menu() {
+  case "${1,,}" in
+  *apps*) walker -p "Launch…" ;;
+  *style*) show_style_menu ;;
+  *theme*) show_style_theme_menu ;;
+  *setup*) show_setup_menu ;;
+  *power*) show_setup_power_menu ;;
+  *install*) show_install_menu ;;
+  *remove*) show_remove_menu ;;
+  *update*) show_update_menu ;;
+  *about*) show_about ;;
+  *system*) show_system_menu ;;
+  esac
+}
+
+# Allow user extensions and overrides
+USER_EXTENSIONS="$HOME/.config/cachy-dots/extensions/menu.sh"
+[[ -f $USER_EXTENSIONS ]] && source "$USER_EXTENSIONS"
+
+toggle_existing_menu
+
+if [[ -n "${1:-}" ]]; then
+  BACK_TO_EXIT=true
+  go_to_menu "$1"
+else
+  show_main_menu
+fi
