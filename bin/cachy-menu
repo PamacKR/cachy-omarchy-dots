@@ -114,6 +114,7 @@ show_setup_default_browser_menu() {
   local options=""
   browser_desktop_exists chromium.desktop && options="$options  Chromium"
   browser_desktop_exists google-chrome.desktop && options="${options:+$options\n}󰊯  Chrome"
+  browser_desktop_exists brave-origin-beta.desktop && options="${options:+$options\n}󰖟  Brave Origin"
   browser_desktop_exists brave-browser.desktop && options="${options:+$options\n}󰖟  Brave"
   browser_desktop_exists microsoft-edge.desktop && options="${options:+$options\n}󰇩  Edge"
   browser_desktop_exists firefox.desktop && options="${options:+$options\n}󰈹  Firefox"
@@ -123,6 +124,7 @@ show_setup_default_browser_menu() {
   case "$(cachy-default-browser)" in
   chromium) current="  Chromium" ;;
   chrome) current="󰊯  Chrome" ;;
+  brave-origin) current="󰖟  Brave Origin" ;;
   brave) current="󰖟  Brave" ;;
   edge) current="󰇩  Edge" ;;
   firefox) current="󰈹  Firefox" ;;
@@ -132,6 +134,7 @@ show_setup_default_browser_menu() {
   case $(menu "Default Browser" "$options" "" "$current") in
   *Chromium*) cachy-default-browser chromium ;;
   *Chrome*) cachy-default-browser chrome ;;
+  *"Brave Origin"*) cachy-default-browser brave-origin ;;
   *Brave*) cachy-default-browser brave ;;
   *Edge*) cachy-default-browser edge ;;
   *Firefox*) cachy-default-browser firefox ;;
