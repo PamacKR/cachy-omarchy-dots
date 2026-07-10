@@ -42,7 +42,7 @@ command -v yay >/dev/null 2>&1 || {
 
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd tesseract tesseract-data-eng
-  ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swaybg swayidle
+  ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swayidle
   grim slurp wl-clipboard jq sddm plymouth qt5-declarative qt5-svg
 )
 
@@ -100,7 +100,7 @@ update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 
 log "Enabling systemd user services..."
 systemctl --user daemon-reload
-for unit in walker mako swayosd polkit-agent battery-suspend-watch dms; do
+for unit in elephant walker mako swayosd polkit-agent battery-suspend-watch dms; do
   systemctl --user enable "$unit.service" 2>/dev/null || true
 done
 

@@ -119,16 +119,18 @@ animations {
     }
 }
 
-// Companions that make up the rest of the "Omarchy look": launcher,
-// notifications, OSD, polkit agent, wallpaper daemon. DMS itself is started
-// the same way. See systemd/user/*.service for the restart-on-crash units.
+// Companions that make up the rest of the "Omarchy look": launcher's backend,
+// launcher, notifications, OSD, polkit agent. DMS itself is started the same
+// way, and DMS owns wallpaper rendering itself (set it via DMS's own
+// Personalization > Wallpaper settings, not here) - no swaybg needed.
+// See systemd/user/*.service for the restart-on-crash units.
+spawn-at-startup "systemctl" "--user" "start" "elephant.service"
 spawn-at-startup "systemctl" "--user" "start" "walker.service"
 spawn-at-startup "systemctl" "--user" "start" "mako.service"
 spawn-at-startup "systemctl" "--user" "start" "dms.service"
 spawn-at-startup "systemctl" "--user" "start" "swayosd.service"
 spawn-at-startup "systemctl" "--user" "start" "polkit-agent.service"
 spawn-at-startup "systemctl" "--user" "start" "battery-suspend-watch.service"
-spawn-at-startup "swaybg" "-i" "~/.config/cachy-dots/current/background" "-m" "fill"
 
 window-rule {
     match app-id=r#"^org\.gnome\."#
