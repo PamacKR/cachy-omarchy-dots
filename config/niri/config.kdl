@@ -134,7 +134,10 @@ spawn-at-startup "systemctl" "--user" "start" "battery-suspend-watch.service"
 
 // heyoeyo/niri_tweaks: first window maximizes, second triggers a 50/50
 // split, beyond 2 windows niri's own scrolling column-width takes over.
-spawn-at-startup "python3" "/home/pamac/.local/share/cachy-dots/third-party/niri_tile_to_n.py" "-n" "2"
+// -m applies the same logic to windows moved into a workspace (not just
+// newly opened ones), so a window moved to an empty workspace re-maximizes
+// instead of staying at whatever width it had before the move.
+spawn-at-startup "python3" "/home/pamac/.local/share/cachy-dots/third-party/niri_tile_to_n.py" "-n" "2" "-m"
 
 window-rule {
     match app-id=r#"^org\.gnome\."#
