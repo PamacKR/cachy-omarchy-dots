@@ -74,7 +74,7 @@ show_remove_menu() {
 }
 
 show_style_menu() {
-  case $(menu "Style" "󰸌  Theme\n  Font\n  Background") in
+  case $(menu "Style" "󰸌  Theme\n  Font\n  Background") in
   *Theme*) show_style_theme_menu ;;
   *Font*) show_style_font_menu ;;
   *Background*) dms ipc call dankdash wallpaper ;;
