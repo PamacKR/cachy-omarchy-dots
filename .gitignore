@@ -13,3 +13,17 @@ config/niri/dms/outputs.kdl
 config/niri/dms/cursor.kdl
 config/niri/dms/windowrules.kdl
 config/niri/dms/wpblur.kdl
+
+# DMS's own per-app "matugen" theme integration writes these directly into
+# app config dirs we track - separate files, doesn't touch the configs we
+# actually manage (alacritty.toml, settings.ini, config.kdl), but it's noise
+# we don't want tracked. Same for niri's own defensive backups of config.kdl.
+config/alacritty/dank-theme.toml
+config/gtk-3.0/dank-colors.css
+config/gtk-4.0/dank-colors.css
+config/niri/config.kdl.backup*
+config/niri/config.kdl.dmsbackup*
+
+# Dynamic output from cachy-default-editor, not a source-controlled config -
+# regenerates itself whenever you change the default editor via cachy-menu.
+config/environment.d/editor.conf

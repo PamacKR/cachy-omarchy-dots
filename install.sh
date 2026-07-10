@@ -107,6 +107,20 @@ for entry in "$CACHY_DOTS_PATH"/config/*; do
     done
     continue
   fi
+  if [[ "$name" == "dms" ]]; then
+    # DMS's real config dir is ~/.config/DankMaterialShell, not ~/.config/dms -
+    # symlink the settings snapshot (and any custom themes it references)
+    # specifically, rather than the whole config/dms/ directory (which also
+    # holds this README, not something DMS should see).
+    mkdir -p "$HOME/.config/DankMaterialShell/themes"
+    [[ -f "$entry/settings.json" ]] &&
+      ln -sf "$entry/settings.json" "$HOME/.config/DankMaterialShell/settings.json"
+    for theme_dir in "$entry"/themes/*/; do
+      [[ -d "$theme_dir" ]] || continue
+      ln -sfn "$theme_dir" "$HOME/.config/DankMaterialShell/themes/$(basename "$theme_dir")"
+    done
+    continue
+  fi
   rm -rf "$target"
   ln -s "$entry" "$target"
 done
@@ -159,6 +173,9 @@ systemctl --user daemon-reload
 for unit in elephant walker mako swayosd polkit-agent battery-suspend-watch dms; do
   systemctl --user enable "$unit.service" 2>/dev/null || true
 done
+# Pick up an updated DMS settings snapshot immediately on a re-run, rather
+# than only at next login.
+systemctl --user restart dms.service 2>/dev/null || true
 
 # --- SDDM login theme ---------------------------------------------------------
 
