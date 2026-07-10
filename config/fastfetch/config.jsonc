@@ -34,7 +34,12 @@
     "memory",
     "disk",
     "battery",
-    "weather",
+    {
+      // Default format is "%t - %C (%l)" (temp - condition - location) -
+      // drops the location, since it made the line too long.
+      "type": "weather",
+      "outputFormat": "%t+-+%C"
+    },
     {
       // 5 tokyo-night colors as circles, since fastfetch's built-in "colors"
       // module can only limit the count when using symbol=block/background,
