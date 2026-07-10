@@ -132,6 +132,10 @@ spawn-at-startup "systemctl" "--user" "start" "swayosd.service"
 spawn-at-startup "systemctl" "--user" "start" "polkit-agent.service"
 spawn-at-startup "systemctl" "--user" "start" "battery-suspend-watch.service"
 
+// heyoeyo/niri_tweaks: first window maximizes, second triggers a 50/50
+// split, beyond 2 windows niri's own scrolling column-width takes over.
+spawn-at-startup "python3" "/home/pamac/.local/share/cachy-dots/third-party/niri_tile_to_n.py" "-n" "2"
+
 window-rule {
     match app-id=r#"^org\.gnome\."#
     draw-border-with-background false

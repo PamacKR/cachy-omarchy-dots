@@ -51,6 +51,8 @@ PACKAGES=(
   # browser) - without these, a fresh install silently has broken defaults
   # for opening files/directories/links until you notice and install by hand.
   neovim nautilus brave-origin-bin zip unzip
+  # niri_tile_to_n.py (third-party/) needs a python3 interpreter.
+  python
   # Lock screen. hyprlock isn't Hyprland-only - it also implements the
   # ext-session-lock-v1 protocol, which niri supports.
   hyprlock
