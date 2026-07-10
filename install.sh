@@ -43,7 +43,7 @@ command -v yay >/dev/null 2>&1 || {
 PACKAGES=(
   walker elephant mako alacritty imv evince mpv swayosd tesseract tesseract-data-eng
   ttf-jetbrains-mono-nerd papirus-icon-theme breeze polkit-gnome swaybg swayidle
-  grim slurp wl-clipboard jq
+  grim slurp wl-clipboard jq sddm plymouth
 )
 
 log "Installing packages (pacman, falling back to yay/AUR per-package)..."
@@ -107,6 +107,7 @@ done
 # --- SDDM login theme ---------------------------------------------------------
 
 log "Installing SDDM theme (requires sudo)..."
+sudo mkdir -p /usr/share/sddm/themes
 sudo rm -rf /usr/share/sddm/themes/omarchy-look
 sudo cp -r "$CACHY_DOTS_PATH/sddm/omarchy-look" /usr/share/sddm/themes/omarchy-look
 sudo mkdir -p /etc/sddm.conf.d
@@ -117,6 +118,7 @@ sudo systemctl enable sddm.service
 # --- Plymouth boot splash ------------------------------------------------------
 
 log "Installing Plymouth theme (requires sudo)..."
+sudo mkdir -p /usr/share/plymouth/themes
 sudo rm -rf /usr/share/plymouth/themes/omarchy-look
 sudo cp -r "$CACHY_DOTS_PATH/plymouth/omarchy-look" /usr/share/plymouth/themes/omarchy-look
 sudo plymouth-set-default-theme omarchy-look
