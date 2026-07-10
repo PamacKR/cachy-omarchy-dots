@@ -5,8 +5,10 @@
   // interactively: `fastfetch -c ~/.config/fastfetch/config.jsonc` re-renders
   // instantly, no restart needed.
   "logo": {
-    "source": "auto",
-    "width": 18,
+    // Built-in ASCII logos are fixed text, not actually rescalable via
+    // width/padding - those only adjust spacing around it. "_small" is
+    // fastfetch's naming convention for compact distro logo variants.
+    "source": "cachyos_small",
     "padding": {
       "top": 1,
       "right": 2
