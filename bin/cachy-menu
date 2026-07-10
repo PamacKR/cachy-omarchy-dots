@@ -56,7 +56,7 @@ open_in_editor() {
 }
 
 show_install_menu() {
-  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App") in
+  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App") in
   *Package*) terminal cachy-pkg-install ;;
   *AUR*) terminal cachy-pkg-aur-install ;;
   *Web*) present_terminal "install-web-apps" ;;
@@ -65,7 +65,7 @@ show_install_menu() {
 }
 
 show_remove_menu() {
-  case $(menu "Remove" "󰣇  Package\n  Web App\n  AUR") in
+  case $(menu "Remove" "󰣇  Package\n  Web App\n󰣇  AUR") in
   *Package*) terminal cachy-pkg-remove ;;
   *Web*) present_terminal "uninstall-web-apps" ;;
   *AUR*) terminal cachy-pkg-remove ;;
@@ -74,7 +74,7 @@ show_remove_menu() {
 }
 
 show_style_menu() {
-  case $(menu "Style" "󰸌  Theme\n  Font\n  Background") in
+  case $(menu "Style" "󰸌  Theme\n  Font\n  Background") in
   *Theme*) show_style_theme_menu ;;
   *Font*) show_style_font_menu ;;
   *Background*) dms ipc call dankdash wallpaper ;;
@@ -112,7 +112,7 @@ browser_desktop_exists() {
 
 show_setup_default_browser_menu() {
   local options=""
-  browser_desktop_exists chromium.desktop && options="$options  Chromium"
+  browser_desktop_exists chromium.desktop && options="$options  Chromium"
   browser_desktop_exists google-chrome.desktop && options="${options:+$options\n}󰊯  Chrome"
   browser_desktop_exists brave-origin.desktop && options="${options:+$options\n}󰖟  Brave Origin"
   browser_desktop_exists brave-browser.desktop && options="${options:+$options\n}󰖟  Brave"
@@ -122,7 +122,7 @@ show_setup_default_browser_menu() {
 
   local current=""
   case "$(cachy-default-browser)" in
-  chromium) current="  Chromium" ;;
+  chromium) current="  Chromium" ;;
   chrome) current="󰊯  Chrome" ;;
   brave-origin) current="󰖟  Brave Origin" ;;
   brave) current="󰖟  Brave" ;;
@@ -145,17 +145,17 @@ show_setup_default_browser_menu() {
 
 show_setup_default_terminal_menu() {
   local options=""
-  cachy-cmd-present alacritty && options="$options  Alacritty"
-  cachy-cmd-present foot && options="${options:+$options\n}  Foot"
-  cachy-cmd-present ghostty && options="${options:+$options\n}  Ghostty"
-  cachy-cmd-present kitty && options="${options:+$options\n}  Kitty"
+  cachy-cmd-present alacritty && options="$options  Alacritty"
+  cachy-cmd-present foot && options="${options:+$options\n}  Foot"
+  cachy-cmd-present ghostty && options="${options:+$options\n}  Ghostty"
+  cachy-cmd-present kitty && options="${options:+$options\n}  Kitty"
 
   local current=""
   case "$(cachy-default-terminal)" in
-  alacritty) current="  Alacritty" ;;
-  foot) current="  Foot" ;;
-  ghostty) current="  Ghostty" ;;
-  kitty) current="  Kitty" ;;
+  alacritty) current="  Alacritty" ;;
+  foot) current="  Foot" ;;
+  ghostty) current="  Ghostty" ;;
+  kitty) current="  Kitty" ;;
   esac
 
   case $(menu "Default Terminal" "$options" "" "$current") in
@@ -169,21 +169,21 @@ show_setup_default_terminal_menu() {
 
 show_setup_default_editor_menu() {
   local options=""
-  cachy-cmd-present nvim && options="$options  Neovim"
-  cachy-cmd-present code && options="${options:+$options\n}  VSCode"
-  cachy-cmd-present zeditor && options="${options:+$options\n}  Zed"
-  cachy-cmd-present helix && options="${options:+$options\n}  Helix"
-  cachy-cmd-present vim && options="${options:+$options\n}  Vim"
-  cachy-cmd-present emacs && options="${options:+$options\n}  Emacs"
+  cachy-cmd-present nvim && options="$options  Neovim"
+  cachy-cmd-present code && options="${options:+$options\n}  VSCode"
+  cachy-cmd-present zeditor && options="${options:+$options\n}  Zed"
+  cachy-cmd-present helix && options="${options:+$options\n}  Helix"
+  cachy-cmd-present vim && options="${options:+$options\n}  Vim"
+  cachy-cmd-present emacs && options="${options:+$options\n}  Emacs"
 
   local current=""
   case "$(cachy-default-editor)" in
-  nvim) current="  Neovim" ;;
-  code) current="  VSCode" ;;
-  zed | zeditor) current="  Zed" ;;
-  helix) current="  Helix" ;;
-  vim) current="  Vim" ;;
-  emacs) current="  Emacs" ;;
+  nvim) current="  Neovim" ;;
+  code) current="  VSCode" ;;
+  zed | zeditor) current="  Zed" ;;
+  helix) current="  Helix" ;;
+  vim) current="  Vim" ;;
+  emacs) current="  Emacs" ;;
   esac
 
   case $(menu "Default Editor" "$options" "" "$current") in
@@ -198,7 +198,7 @@ show_setup_default_editor_menu() {
 }
 
 show_setup_default_menu() {
-  case $(menu "Default" "  Browser\n  Terminal\n  Editor") in
+  case $(menu "Default" "  Browser\n  Terminal\n  Editor") in
   *Browser*) show_setup_default_browser_menu ;;
   *Terminal*) show_setup_default_terminal_menu ;;
   *Editor*) show_setup_default_editor_menu ;;
@@ -215,7 +215,7 @@ show_setup_security_menu() {
 }
 
 show_setup_config_menu() {
-  case $(menu "Setup" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
+  case $(menu "Setup" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
   *Niri*) open_in_editor ~/.config/niri/config.kdl ;;
   *Keybinds*) open_in_editor ~/.config/niri/dms/binds.kdl ;;
   *Plymouth*) open_in_editor "$CACHY_DOTS_PATH/plymouth/omarchy-look/omarchy-look.script" ;;
@@ -237,7 +237,7 @@ show_setup_power_menu() {
 }
 
 show_setup_menu() {
-  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰒲  Suspend\n󰍹  Displays\n  Config\n  Defaults\n󰱔  DNS\n  Security"
+  local options="  Audio\n  Wifi\n󰂯  Bluetooth\n󱐋  Power Profile\n󰒲  Suspend\n󰍹  Displays\n  Config\n  Defaults\n󰱔  DNS\n  Security"
 
   case $(menu "Setup" "$options") in
   *Audio*) launch-or-focus "pavucontrol" "setsid pavucontrol" ;;
@@ -255,7 +255,7 @@ show_setup_menu() {
 }
 
 show_update_process_menu() {
-  case $(menu "Restart" "󰎟  Mako\n  Swayosd\n󰌧  Walker\n  DMS") in
+  case $(menu "Restart" "󰎟  Mako\n  Swayosd\n󰌧  Walker\n󰍜  DMS") in
   *Mako*) cachy-restart-mako ;;
   *Swayosd*) cachy-restart-swayosd ;;
   *Walker*) cachy-restart-walker ;;
@@ -265,7 +265,7 @@ show_update_process_menu() {
 }
 
 show_update_config_menu() {
-  case $(menu "Restore default" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
+  case $(menu "Restore default" "  Niri\n  Keybinds\n󱣴  Plymouth\n  Swayosd\n󰌧  Walker\n󰎟  Mako") in
   *Niri*) present_terminal "cachy-refresh-config config/niri/config.kdl" ;;
   *Keybinds*) present_terminal "cachy-refresh-config config/niri/dms/binds.kdl" ;;
   *Plymouth*) present_terminal "cachy-refresh-config plymouth/omarchy-look/omarchy-look.script" ;;
@@ -277,7 +277,7 @@ show_update_config_menu() {
 }
 
 show_update_hardware_menu() {
-  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
+  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
   *Audio*) present_terminal cachy-restart-pipewire ;;
   *Wi-Fi*) present_terminal cachy-restart-wifi ;;
   *Bluetooth*) present_terminal cachy-restart-bluetooth ;;
@@ -287,7 +287,7 @@ show_update_hardware_menu() {
 }
 
 show_update_password_menu() {
-  case $(menu "Update Password" "  Drive Encryption\n  User") in
+  case $(menu "Update Password" "  Drive Encryption\n  User") in
   *Drive*) present_terminal cachy-drive-password ;;
   *User*) present_terminal passwd ;;
   *) show_update_menu ;;
@@ -295,7 +295,7 @@ show_update_password_menu() {
 }
 
 show_update_menu() {
-  case $(menu "Update" "  Config\n  Process\n󰇅  Hardware\n  Firmware\n  Password\n  Timezone\n  Time") in
+  case $(menu "Update" "  Config\n  Process\n  Hardware\n  Firmware\n  Password\n  Timezone\n  Time") in
   *Config*) show_update_config_menu ;;
   *Process*) show_update_process_menu ;;
   *Hardware*) show_update_hardware_menu ;;
@@ -329,7 +329,7 @@ show_system_menu() {
 }
 
 show_main_menu() {
-  go_to_menu "$(menu "Go" "󰀻  Apps\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  About\n  System")"
+  go_to_menu "$(menu "Go" "󰀻  Apps\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  About\n  System")"
 }
 
 go_to_menu() {
