@@ -4,9 +4,10 @@ PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
-# Adjust ExecStart once DMS is installed and its actual launch command/binary
-# name is known - this is a placeholder (see task: DMS panel config).
-ExecStart=/usr/bin/dms
+# `dms` with no subcommand just prints its own --help and exits (confirmed
+# live) - `run` is the subcommand that actually launches quickshell with the
+# DMS configuration.
+ExecStart=/usr/bin/dms run
 Restart=on-failure
 RestartSec=1
 
