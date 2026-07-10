@@ -117,7 +117,11 @@ for entry in "$CACHY_DOTS_PATH"/config/*; do
       ln -sf "$entry/settings.json" "$HOME/.config/DankMaterialShell/settings.json"
     for theme_dir in "$entry"/themes/*/; do
       [[ -d "$theme_dir" ]] || continue
-      ln -sfn "$theme_dir" "$HOME/.config/DankMaterialShell/themes/$(basename "$theme_dir")"
+      theme_target="$HOME/.config/DankMaterialShell/themes/$(basename "$theme_dir")"
+      # -f only replaces an existing symlink/file, not a real directory (which
+      # is what's there today, since DMS itself created it) - remove it first.
+      [[ -e "$theme_target" && ! -L "$theme_target" ]] && rm -rf "$theme_target"
+      ln -sfn "$theme_dir" "$theme_target"
     done
     continue
   fi
