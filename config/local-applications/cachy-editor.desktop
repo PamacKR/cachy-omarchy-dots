@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Text Editor
+Exec=launch-editor %F
+Terminal=false
+Icon=text-editor
+Categories=Utility;TextEditor;
+StartupNotify=false
