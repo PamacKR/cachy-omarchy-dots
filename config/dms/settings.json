@@ -535,7 +535,7 @@
   "updaterUseCustomCommand": false,
   "updaterCustomCommand": "",
   "updaterTerminalAdditionalParams": "",
-  "updaterIntervalSeconds": 1800,
+  "updaterIntervalSeconds": 86400,
   "updaterIncludeFlatpak": true,
   "updaterAllowAUR": true,
   "displayNameMode": "system",
@@ -565,20 +565,39 @@
       "showOnLastDisplay": true,
       "leftWidgets": [
         "workspaceSwitcher",
-        "focusedWindow"
+        {
+          "id": "focusedWindow",
+          "enabled": true,
+          "focusedWindowSize": 0,
+          "focusedWindowCompactMode": false,
+          "focusedWindowShowIcon": true
+        }
       ],
       "centerWidgets": [
         "music",
-        "clock"
+        {
+          "id": "clock",
+          "enabled": true,
+          "clockCompactMode": false
+        }
       ],
       "rightWidgets": [
         {
           "id": "systemTray",
           "enabled": true
         },
-        "clipboard",
         "battery",
-        "controlCenterButton"
+        {
+          "id": "controlCenterButton",
+          "enabled": true,
+          "showNetworkIcon": false,
+          "showAudioIcon": false,
+          "showAudioPercent": false,
+          "showBrightnessIcon": false,
+          "showBrightnessPercent": false,
+          "showMicIcon": false,
+          "showMicPercent": false
+        }
       ],
       "spacing": 0,
       "innerPadding": -3,
