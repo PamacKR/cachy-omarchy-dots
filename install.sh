@@ -158,17 +158,15 @@ chmod +x "$WEBAPPS_SRC/install.sh"
 "$WEBAPPS_SRC/install.sh"
 
 # --- File associations -------------------------------------------------------
+#
+# All default-app mappings live in config/mimeapps.list (symlinked above) -
+# there used to also be an `xdg-mime default ...` block here, but xdg-mime
+# writes straight into that same symlinked file (rewriting/resorting its
+# existing keys), which was the actual cause of the local mimeapps.list drift
+# hit earlier - one source of truth is simpler and safer than keeping two
+# copies of the same mapping in sync.
 
-log "Setting default apps via xdg-mime..."
-xdg-mime default org.gnome.Nautilus.desktop inode/directory
-xdg-mime default imv.desktop image/png image/jpeg image/gif image/webp image/bmp image/tiff
-xdg-mime default org.gnome.Evince.desktop application/pdf
-xdg-mime default mpv.desktop video/mp4 video/x-msvideo video/x-matroska video/x-flv video/x-ms-wmv \
-  video/mpeg video/ogg video/webm video/quicktime video/3gpp video/3gpp2 video/x-ms-asf \
-  video/x-ogm+ogg video/x-theora+ogg application/ogg
-xdg-mime default nvim.desktop text/plain text/english text/x-makefile text/x-c++hdr text/x-c++src \
-  text/x-chdr text/x-csrc text/x-java text/x-moc text/x-pascal text/x-tcl text/x-tex \
-  application/x-shellscript text/x-c text/x-c++ application/xml text/xml
+log "Refreshing desktop/mime databases..."
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 systemctl --user restart elephant.service 2>/dev/null || true
 
