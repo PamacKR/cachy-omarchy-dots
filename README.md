@@ -21,10 +21,11 @@ what's intentionally left out.
 ./bootstrap.sh
 ```
 
-Installs `base-devel`+`git`, builds `yay` from the AUR, installs Niri, then
-runs DMS's own installer (`curl -fsSL https://install.danklinux.com | sh`) -
-this step is interactive, so make your own choices there - and once that's
-done, hands off straight into `install.sh` for everything else.
+Installs `base-devel`+`git`, builds `yay` from the AUR, then runs DMS's own
+installer (`curl -fsSL https://install.danklinux.com | sh`, which installs
+Niri itself) - this step is interactive, so make your own choices there -
+and once that's done, hands off straight into `install.sh` for everything
+else.
 
 **If Niri and DMS are already installed:**
 
