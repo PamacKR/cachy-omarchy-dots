@@ -172,7 +172,7 @@ window-rule {
 // The scratch terminal launch-tui/launch-editor spawn for TUI editors etc.
 window-rule {
     match app-id="^cachy-dots-scratch-term$"
-    open-floating true
+    open-floating false
     default-column-width { proportion 0.6; }
 }
 
