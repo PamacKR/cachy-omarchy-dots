@@ -36,7 +36,7 @@
       // Default format appends " - {filesystem}" (e.g. "- btrfs") - dropped,
       // keeping just used/total/percentage.
       "type": "disk",
-      "outputFormat": "{size-used} / {size-total} ({size-percentage})"
+      "format": "{size-used} / {size-total} ({size-percentage})"
     },
     "battery",
     {
