@@ -43,11 +43,11 @@ menu() {
 }
 
 terminal() {
-  exec setsid alacritty -e "$@"
+  exec setsid alacritty --class "cachy-dots-menu-term,cachy-dots-menu-term" -e "$@"
 }
 
 present_terminal() {
-  launch-tui bash -c "$1"
+  launch-tui cachy-dots-menu-term bash -c "$1"
 }
 
 open_in_editor() {
@@ -255,7 +255,7 @@ show_setup_menu() {
 }
 
 show_about() {
-  launch-tui bash -c 'fastfetch; read -n 1 -s'
+  launch-tui cachy-dots-menu-term bash -c 'fastfetch; read -n 1 -s'
 }
 
 show_system_menu() {

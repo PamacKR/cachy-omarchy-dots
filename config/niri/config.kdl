@@ -169,13 +169,22 @@ window-rule {
     draw-border-with-background false
 }
 
-// The scratch terminal launch-tui/launch-editor spawn for TUI editors etc.
-// No default-column-width here - niri_tile_to_n.py (see spawn-at-startup
-// above) already governs tiled-window width (maximize when alone, 50/50
-// with a sibling); a fixed proportion here would override that.
+// The scratch terminal launch-editor spawns for TUI editors. No
+// default-column-width here - niri_tile_to_n.py (see spawn-at-startup above)
+// already governs tiled-window width (maximize when alone, 50/50 with a
+// sibling); a fixed proportion here would override that.
 window-rule {
     match app-id="^cachy-dots-scratch-term$"
     open-floating false
+}
+
+// cachy-menu's own utility terminals (About, Install/Remove Package|AUR|Web
+// App, Setup DNS/security) - a separate app-id from the editor scratch term
+// above, so this can float independently of it.
+window-rule {
+    match app-id="^cachy-dots-menu-term$"
+    open-floating true
+    default-column-width { proportion 0.6; }
 }
 
 // Walker is a layer-shell surface, not a regular toplevel, so this is mostly

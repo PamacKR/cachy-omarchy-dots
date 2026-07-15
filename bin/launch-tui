@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# Launch a TUI command in a floating Alacritty scratch terminal.
-# Usage: launch-tui <command> [args...]
+# Launch a TUI command in an Alacritty scratch terminal, tagged with a given
+# app-id/class so niri's window-rules can decide floating vs tiled per caller
+# (the text-editor scratch term tiles; cachy-menu's utility terminals float).
+# Usage: launch-tui <app-id> <command> [args...]
 set -euo pipefail
 
-[[ $# -ge 1 ]] || { echo "Usage: launch-tui <command> [args...]" >&2; exit 1; }
+[[ $# -ge 2 ]] || { echo "Usage: launch-tui <app-id> <command> [args...]" >&2; exit 1; }
 
-exec setsid alacritty --class "cachy-dots-scratch-term,cachy-dots-scratch-term" -e "$@"
+app_id="$1"
+shift
+
+exec setsid alacritty --class "$app_id,$app_id" -e "$@"
