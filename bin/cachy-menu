@@ -255,11 +255,12 @@ show_setup_menu() {
 }
 
 show_about() {
-  # Own app-id (not cachy-dots-menu-term) so its fixed size doesn't affect
-  # the other menu terminals (package/web-app install-remove output needs
-  # more room than fastfetch's fixed ~20-line summary).
+  # Own app-id (not cachy-dots-menu-term) so its fixed size (set via niri's
+  # own window-rule, not Alacritty's window.dimensions - unreliable on
+  # Wayland, see config.kdl) doesn't affect the other menu terminals
+  # (package/web-app install-remove output needs more room than fastfetch's
+  # fixed ~20-line summary).
   exec setsid alacritty --class "cachy-dots-about-term,cachy-dots-about-term" \
-    -o window.dimensions.columns=95 -o window.dimensions.lines=22 \
     -e bash -c 'fastfetch; read -n 1 -s'
 }
 

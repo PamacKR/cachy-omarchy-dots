@@ -187,12 +187,17 @@ window-rule {
     default-column-width { proportion 0.6; }
 }
 
-// cachy-menu's About window - its own app-id (not cachy-dots-menu-term) since
-// it sets its own fixed Alacritty size to fit fastfetch's output snugly
-// instead of using this class's default-column-width.
+// cachy-menu's About window - its own app-id (not cachy-dots-menu-term),
+// pinned to a fixed size that fits fastfetch's ~20-line output snugly.
+// Alacritty's own `-o window.dimensions` is unreliable on Wayland (known
+// upstream issue: inconsistent/incorrect sizing vs X11), so the size is set
+// here instead, on the compositor side - default-column-width/
+// default-window-height apply to floating windows too despite the name.
 window-rule {
     match app-id="^cachy-dots-about-term$"
     open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 480; }
 }
 
 // Walker is a layer-shell surface, not a regular toplevel, so this is mostly
