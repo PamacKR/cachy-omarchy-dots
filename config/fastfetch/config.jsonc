@@ -32,7 +32,12 @@
     "cpu",
     "gpu",
     "memory",
-    "disk",
+    {
+      // Default format appends " - {filesystem}" (e.g. "- btrfs") - dropped,
+      // keeping just used/total/percentage.
+      "type": "disk",
+      "outputFormat": "{size-used} / {size-total} ({size-percentage})"
+    },
     "battery",
     {
       // Default format is "%t - %C (%l)" (temp - condition - location) -
