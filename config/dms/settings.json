@@ -1,7 +1,7 @@
 {
   "currentThemeName": "custom",
   "currentThemeCategory": "custom",
-  "customThemeFile": "/home/pamac/.config/DankMaterialShell/themes/tokyoNightDark/theme.json",
+  "customThemeFile": "/home/pamac/.config/DankMaterialShell/themes/monochrome/theme.json",
   "registryThemeVariants": {},
   "matugenScheme": "scheme-tonal-spot",
   "matugenContrast": 0,
@@ -558,7 +558,7 @@
       "id": "default",
       "name": "Main Bar",
       "enabled": true,
-      "position": 0,
+      "position": 1,
       "screenPreferences": [
         "all"
       ],
@@ -574,12 +574,7 @@
         }
       ],
       "centerWidgets": [
-        "music",
-        {
-          "id": "clock",
-          "enabled": true,
-          "clockCompactMode": false
-        }
+        "music"
       ],
       "rightWidgets": [
         {
@@ -587,6 +582,11 @@
           "enabled": true
         },
         "battery",
+        {
+          "id": "clock",
+          "enabled": true,
+          "clockCompactMode": true
+        },
         {
           "id": "controlCenterButton",
           "enabled": true,
