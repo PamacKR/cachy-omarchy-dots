@@ -132,6 +132,6 @@ binds {
     Super+Return hotkey-overlay-title="Open Terminal" { spawn "alacritty"; }
     Mod+D repeat=false { toggle-overview; }
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
-    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Shift+Slash hotkey-overlay-title="Show Keybinds" { spawn "cachy-keybinds"; }
     Mod+Tab repeat=false { toggle-overview; }
 }

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Searchable Walker menu listing every niri keybind - replaces niri's
+# built-in hotkey overlay (Mod+Shift+Slash), which isn't searchable and
+# disappears on any click outside it.
+#
+# Parses config/niri/dms/binds.kdl live (the single source of truth - it's
+# what DMS's own Keyboard Shortcuts settings page writes to) rather than
+# hand-maintaining a separate list that would drift out of sync.
+set -euo pipefail
+
+BINDS_FILE="$HOME/.config/niri/dms/binds.kdl"
+
+prettify() {
+  # "focus-workspace-down 1" -> "Focus Workspace Down 1"
+  local s="${1//-/ }"
+  awk '{for (i=1; i<=NF; i++) $i = toupper(substr($i,1,1)) substr($i,2); print}' <<<"$s"
+}
+
+entries=()
+while IFS= read -r raw; do
+  line="$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' <<<"$raw")"
+  [[ -z "$line" || "$line" == "binds {" || "$line" == "}" || "$line" == //* ]] && continue
+
+  keycombo="${line%% *}"
+
+  if [[ "$line" =~ hotkey-overlay-title=\"([^\"]*)\" ]]; then
+    desc="${BASH_REMATCH[1]}"
+  else
+    action="$(sed -n 's/.*{[[:space:]]*\(.*\);.*}.*/\1/p' <<<"$line")"
+    desc="$(prettify "${action//\"/}")"
+  fi
+
+  entries+=("$(printf '%-28s %s' "$keycombo" "$desc")")
+done < <(sed -n '/^binds {/,/^}/p' "$BINDS_FILE")
+
+printf '%s\n' "${entries[@]}" | sort |
+  cachy-launch-walker --dmenu --width 500 --minheight 1 --maxheight 630 -p "Keybinds…" >/dev/null 2>&1 || true
