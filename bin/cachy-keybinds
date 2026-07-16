@@ -5,33 +5,51 @@
 #
 # Parses config/niri/dms/binds.kdl live (the single source of truth - it's
 # what DMS's own Keyboard Shortcuts settings page writes to) rather than
-# hand-maintaining a separate list that would drift out of sync.
+# hand-maintaining a separate list that would drift out of sync. Done as a
+# single awk pass rather than a bash loop forking sed/awk per line (~135
+# lines x 2-3 subprocesses each was the actual cause of the noticeable
+# startup delay).
 set -euo pipefail
 
 BINDS_FILE="$HOME/.config/niri/dms/binds.kdl"
 
-prettify() {
-  # "focus-workspace-down 1" -> "Focus Workspace Down 1"
-  local s="${1//-/ }"
-  awk '{for (i=1; i<=NF; i++) $i = toupper(substr($i,1,1)) substr($i,2); print}' <<<"$s"
-}
+awk '
+  /^binds \{/ { in_block = 1; next }
+  /^\}/ { in_block = 0 }
+  !in_block { next }
+  {
+    line = $0
+    gsub(/^[ \t]+|[ \t]+$/, "", line)
+    if (line == "" || line ~ /^\/\//) next
 
-entries=()
-while IFS= read -r raw; do
-  line="$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' <<<"$raw")"
-  [[ -z "$line" || "$line" == "binds {" || "$line" == "}" || "$line" == //* ]] && continue
+    split(line, parts, " ")
+    keycombo = parts[1]
 
-  keycombo="${line%% *}"
+    desc = ""
+    if (match(line, /hotkey-overlay-title="[^"]*"/)) {
+      desc = substr(line, RSTART + 22, RLENGTH - 23)
+    } else if (match(line, /\{[^}]*\}/)) {
+      action = substr(line, RSTART + 1, RLENGTH - 2)
+      gsub(/;/, "", action)
+      gsub(/"/, "", action)
+      gsub(/^[ \t]+|[ \t]+$/, "", action)
+      gsub(/-/, " ", action)
+      n = split(action, words, " ")
+      for (i = 1; i <= n; i++) {
+        w = words[i]
+        desc = desc (i > 1 ? " " : "") toupper(substr(w, 1, 1)) substr(w, 2)
+      }
+    }
 
-  if [[ "$line" =~ hotkey-overlay-title=\"([^\"]*)\" ]]; then
-    desc="${BASH_REMATCH[1]}"
-  else
-    action="$(sed -n 's/.*{[[:space:]]*\(.*\);.*}.*/\1/p' <<<"$line")"
-    desc="$(prettify "${action//\"/}")"
-  fi
-
-  entries+=("$(printf '%-28s %s' "$keycombo" "$desc")")
-done < <(sed -n '/^binds {/,/^}/p' "$BINDS_FILE")
-
-printf '%s\n' "${entries[@]}" | sort |
-  cachy-launch-walker --dmenu --width 500 --minheight 1 --maxheight 630 -p "Keybinds…" >/dev/null 2>&1 || true
+    if (length(keycombo) > maxkey) maxkey = length(keycombo)
+    combo[NR] = keycombo
+    text[NR] = desc
+    count = NR
+  }
+  END {
+    fmt = "%-" (maxkey + 3) "s%s\n"
+    for (i = 1; i <= count; i++)
+      if (combo[i] != "") printf fmt, combo[i], text[i]
+  }
+' "$BINDS_FILE" | sort |
+  cachy-launch-walker --dmenu --width 750 --minheight 1 --maxheight 630 -p "Keybinds…" >/dev/null 2>&1 || true
