@@ -70,7 +70,7 @@ Rectangle {
       Rectangle {
         id: entry
         anchors.fill: parent
-        radius: 8
+        radius: 0
         color: "transparent"
         border.width: 2
         border.color: root.loginFailed ? "{{ color1 }}" : "{{ foreground }}"

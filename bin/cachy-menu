@@ -92,8 +92,11 @@ show_style_theme_menu() {
   if [[ -n $theme ]]; then
     # Runs in a real terminal, not inline - theme-set.sh needs sudo to
     # update the SDDM/Plymouth files, and a bare invocation with no TTY has
-    # nowhere for sudo to prompt (silently failed before this).
-    terminal bash -c "\"$CACHY_DOTS_PATH/theme-engine/theme-set.sh\" \"$theme\"; echo; read -n1 -s -r -p 'Press any key to close...'"
+    # nowhere for sudo to prompt (silently failed before this). Own app-id
+    # (cachy-dots-theme-term, not cachy-dots-menu-term) so niri can size it
+    # small - it's just a sudo prompt and a couple of status lines.
+    exec setsid alacritty --class "cachy-dots-theme-term,cachy-dots-theme-term" \
+      -e bash -c "\"$CACHY_DOTS_PATH/theme-engine/theme-set.sh\" \"$theme\"; echo; read -n1 -s -r -p 'Press any key to close...'"
   else
     back_to show_style_menu
   fi

@@ -200,6 +200,16 @@ window-rule {
     default-window-height { fixed 480; }
 }
 
+// cachy-menu's theme-switch terminal (Style > Theme) - just a sudo prompt
+// and a couple of status lines, so a small fixed size instead of
+// cachy-dots-menu-term's 60%-of-screen default.
+window-rule {
+    match app-id="^cachy-dots-theme-term$"
+    open-floating true
+    default-column-width { fixed 600; }
+    default-window-height { fixed 220; }
+}
+
 // Walker is a layer-shell surface, not a regular toplevel, so this is mostly
 // a no-op safety net rather than a required rule.
 window-rule {
