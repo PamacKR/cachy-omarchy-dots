@@ -42,6 +42,9 @@ while IFS='=' read -r key value; do
     echo "s/{{ *${key} *}}/${value}/g"
     echo "s/{{ *${key}_strip *}}/${hex}/g"
     echo "s/{{ *${key}_rgb *}}/${r}, ${g}, ${b}/g"
+    # Semicolon-joined, for raw ANSI escapes (ESC[38;2;r;g;bm) rather than
+    # CSS-style rgba()/rgb() commas.
+    echo "s/{{ *${key}_rgb_semi *}}/${r};${g};${b}/g"
   } >>"$sed_script"
 done < <(grep -E '^[a-zA-Z0-9_]+\s*=' "$colors_toml")
 
