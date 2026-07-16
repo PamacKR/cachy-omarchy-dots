@@ -5,7 +5,10 @@ Rectangle {
   id: root
   width: 640
   height: 480
-  color: "#1a1b26"
+  // Templated by theme-set.sh (uses themes/<name>/colors.toml, not a
+  // static color) - only takes effect after a theme switch re-copies this
+  // file to /usr/share/sddm/themes/omarchy-look/, which needs sudo.
+  color: "{{ background }}"
 
   // userModel.lastUser (and even userModel.data(userModel.index(0,0),...) as a
   // fallback) came back blank on a machine that had never had a successful
@@ -46,7 +49,7 @@ Rectangle {
       font.family: "JetBrainsMono Nerd Font"
       font.pixelSize: 60
       font.letterSpacing: 5
-      color: "#a9b1d6"
+      color: "{{ foreground }}"
       anchors.horizontalCenter: parent.horizontalCenter
     }
 

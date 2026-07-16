@@ -38,6 +38,12 @@ while IFS='=' read -r key value; do
   g=$((16#${hex:2:2}))
   b=$((16#${hex:4:2}))
 
+  # 0.0-1.0 floats (3dp), for Plymouth's Window.SetBackgroundTopColor(r, g, b)
+  # / Image.Text(..., r, g, b, ...) calls, which take floats, not 0-255 ints.
+  r_float="$(awk "BEGIN{printf \"%.3f\", ${r}/255}")"
+  g_float="$(awk "BEGIN{printf \"%.3f\", ${g}/255}")"
+  b_float="$(awk "BEGIN{printf \"%.3f\", ${b}/255}")"
+
   {
     echo "s/{{ *${key} *}}/${value}/g"
     echo "s/{{ *${key}_strip *}}/${hex}/g"
@@ -45,6 +51,7 @@ while IFS='=' read -r key value; do
     # Semicolon-joined, for raw ANSI escapes (ESC[38;2;r;g;bm) rather than
     # CSS-style rgba()/rgb() commas.
     echo "s/{{ *${key}_rgb_semi *}}/${r};${g};${b}/g"
+    echo "s/{{ *${key}_rgb_float *}}/${r_float}, ${g_float}, ${b_float}/g"
   } >>"$sed_script"
 done < <(grep -E '^[a-zA-Z0-9_]+\s*=' "$colors_toml")
 
@@ -71,6 +78,31 @@ echo "$theme_name" >"$STATE_DIR/theme.name"
 niri_dms_colors="$HOME/.config/niri/dms/colors.kdl"
 if [[ -f "$STATE_DIR/theme/niri-dms-colors.kdl" && -d "$(dirname "$niri_dms_colors")" ]]; then
   cat "$STATE_DIR/theme/niri-dms-colors.kdl" >"$niri_dms_colors"
+fi
+
+# SDDM/Plymouth live in root-owned system dirs (install.sh copies them
+# there, they're not symlinked) - render the two templated files here and
+# sudo-copy them over. Note: this updates SDDM and Plymouth's shutdown/
+# reboot screen immediately (both read straight from these files), but the
+# early-boot splash is baked into the initramfs - it stays on the old
+# colors until the next `sudo mkinitcpio -P` (e.g. next install.sh run, or
+# reboot after running that manually). Not run automatically here since
+# it's a slow, heavier operation not worth doing on every theme switch.
+sddm_main_qml="/usr/share/sddm/themes/omarchy-look/Main.qml"
+if [[ -f "$sddm_main_qml" ]]; then
+  rendered_sddm="$(mktemp)"
+  sed -f "$sed_script" "$CACHY_DOTS_PATH/sddm/omarchy-look/Main.qml" >"$rendered_sddm"
+  sudo cp "$rendered_sddm" "$sddm_main_qml" || echo "warning: couldn't update SDDM theme (needs sudo)" >&2
+  rm -f "$rendered_sddm"
+fi
+
+plymouth_script="/usr/share/plymouth/themes/omarchy-look/omarchy-look.script"
+if [[ -f "$plymouth_script" ]]; then
+  rendered_plymouth="$(mktemp)"
+  sed -f "$sed_script" "$CACHY_DOTS_PATH/plymouth/omarchy-look/omarchy-look.script" >"$rendered_plymouth"
+  sudo cp "$rendered_plymouth" "$plymouth_script" || echo "warning: couldn't update Plymouth theme (needs sudo)" >&2
+  rm -f "$rendered_plymouth"
+  echo "note: Plymouth's shutdown/reboot screen is updated; run 'sudo mkinitcpio -P' to also update the early-boot splash."
 fi
 
 # Point the background symlink at the theme's first wallpaper, if any.
