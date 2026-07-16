@@ -64,6 +64,15 @@ mv "$staging" "$STATE_DIR/theme"
 rm -rf "$STATE_DIR/theme.old"
 echo "$theme_name" >"$STATE_DIR/theme.name"
 
+# Copy niri's border/focus-ring colors into its actual include path
+# directly, rather than relying on DMS to regenerate this file itself -
+# that didn't reliably happen when switching themes externally (see
+# theme-engine/templates/niri-dms-colors.kdl.tpl for why).
+niri_dms_colors="$HOME/.config/niri/dms/colors.kdl"
+if [[ -f "$STATE_DIR/theme/niri-dms-colors.kdl" && -d "$(dirname "$niri_dms_colors")" ]]; then
+  cat "$STATE_DIR/theme/niri-dms-colors.kdl" >"$niri_dms_colors"
+fi
+
 # Point the background symlink at the theme's first wallpaper, if any.
 first_bg="$(find "$STATE_DIR/theme/backgrounds" -maxdepth 1 -type f 2>/dev/null | sort | head -n1 || true)"
 if [[ -n "$first_bg" ]]; then
