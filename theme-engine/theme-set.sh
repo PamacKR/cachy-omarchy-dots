@@ -82,17 +82,22 @@ fi
 
 # SDDM/Plymouth live in root-owned system dirs (install.sh copies them
 # there, they're not symlinked) - render the two templated files here and
-# sudo-copy them over. Note: this updates SDDM and Plymouth's shutdown/
-# reboot screen immediately (both read straight from these files), but the
-# early-boot splash is baked into the initramfs - it stays on the old
-# colors until the next `sudo mkinitcpio -P` (e.g. next install.sh run, or
-# reboot after running that manually). Not run automatically here since
-# it's a slow, heavier operation not worth doing on every theme switch.
+# copy them over via pkexec, not sudo: theme-set.sh is usually launched from
+# cachy-menu with no attached terminal/TTY, so a bare `sudo` has nowhere to
+# prompt and just fails silently. pkexec shows a graphical password dialog
+# via the polkit agent that's already running (polkit-agent.service),
+# regardless of whether the caller has a TTY. Note: this updates SDDM and
+# Plymouth's shutdown/reboot screen immediately (both read straight from
+# these files), but the early-boot splash is baked into the initramfs - it
+# stays on the old colors until the next `sudo mkinitcpio -P` (e.g. next
+# install.sh run, or reboot after running that manually). Not run
+# automatically here since it's a slow, heavier operation not worth doing
+# on every theme switch.
 sddm_main_qml="/usr/share/sddm/themes/omarchy-look/Main.qml"
 if [[ -f "$sddm_main_qml" ]]; then
   rendered_sddm="$(mktemp)"
   sed -f "$sed_script" "$CACHY_DOTS_PATH/sddm/omarchy-look/Main.qml" >"$rendered_sddm"
-  sudo cp "$rendered_sddm" "$sddm_main_qml" || echo "warning: couldn't update SDDM theme (needs sudo)" >&2
+  pkexec cp "$rendered_sddm" "$sddm_main_qml" || echo "warning: couldn't update SDDM theme (auth failed/cancelled?)" >&2
   rm -f "$rendered_sddm"
 fi
 
@@ -100,7 +105,7 @@ plymouth_script="/usr/share/plymouth/themes/omarchy-look/omarchy-look.script"
 if [[ -f "$plymouth_script" ]]; then
   rendered_plymouth="$(mktemp)"
   sed -f "$sed_script" "$CACHY_DOTS_PATH/plymouth/omarchy-look/omarchy-look.script" >"$rendered_plymouth"
-  sudo cp "$rendered_plymouth" "$plymouth_script" || echo "warning: couldn't update Plymouth theme (needs sudo)" >&2
+  pkexec cp "$rendered_plymouth" "$plymouth_script" || echo "warning: couldn't update Plymouth theme (auth failed/cancelled?)" >&2
   rm -f "$rendered_plymouth"
   echo "note: Plymouth's shutdown/reboot screen is updated; run 'sudo mkinitcpio -P' to also update the early-boot splash."
 fi
