@@ -52,6 +52,11 @@ while IFS='=' read -r key value; do
     # CSS-style rgba()/rgb() commas.
     echo "s/{{ *${key}_rgb_semi *}}/${r};${g};${b}/g"
     echo "s/{{ *${key}_rgb_float *}}/${r_float}, ${g_float}, ${b_float}/g"
+    # Individual float components, for scripts that need to assign each to
+    # its own variable rather than splat all 3 into one function call.
+    echo "s/{{ *${key}_r_float *}}/${r_float}/g"
+    echo "s/{{ *${key}_g_float *}}/${g_float}/g"
+    echo "s/{{ *${key}_b_float *}}/${b_float}/g"
   } >>"$sed_script"
 done < <(grep -E '^[a-zA-Z0-9_]+\s*=' "$colors_toml")
 

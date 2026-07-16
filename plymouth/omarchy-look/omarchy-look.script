@@ -2,12 +2,22 @@
 # by plain text (no Omarchy branding) that varies by boot/shutdown/reboot/
 # suspend mode.
 #
-# Colors templated by theme-set.sh (themes/<name>/colors.toml) - only takes
-# effect after a theme switch re-copies this file to
-# /usr/share/plymouth/themes/omarchy-look/, which needs sudo.
-
-Window.SetBackgroundTopColor({{ background_rgb_float }});
-Window.SetBackgroundBottomColor({{ background_rgb_float }});
+# Boot/resume are always black background + white text, regardless of the
+# active theme - deliberately NOT theme-templated. The early-boot splash is
+# baked into the initramfs at `mkinitcpio` time, so it'd otherwise go stale
+# every time you switch themes until the next `sudo mkinitcpio -P`; fixing
+# it to one constant look means that's simply never an issue. Shutdown/
+# reboot/suspend, on the other hand, aren't baked into the initramfs (read
+# straight from these files at the time), so those DO follow the active
+# theme (themes/<name>/colors.toml, via theme-set.sh - only takes effect
+# after a theme switch re-copies this file to
+# /usr/share/plymouth/themes/omarchy-look/, which needs sudo).
+global.theme_bg_r = {{ background_r_float }};
+global.theme_bg_g = {{ background_g_float }};
+global.theme_bg_b = {{ background_b_float }};
+global.theme_fg_r = {{ foreground_r_float }};
+global.theme_fg_g = {{ foreground_g_float }};
+global.theme_fg_b = {{ foreground_b_float }};
 
 # Same theme script covers boot, shutdown, reboot and suspend - Plymouth.GetMode()
 # tells us which one so the headline text matches what's actually happening,
@@ -23,8 +33,27 @@ if (global.plymouth_mode == "shutdown") {
   global.logo_text = "CachyOS";
 }
 
+if (global.plymouth_mode == "boot" || global.plymouth_mode == "resume") {
+  global.bg_r = 0;
+  global.bg_g = 0;
+  global.bg_b = 0;
+  global.text_r = 1;
+  global.text_g = 1;
+  global.text_b = 1;
+} else {
+  global.bg_r = global.theme_bg_r;
+  global.bg_g = global.theme_bg_g;
+  global.bg_b = global.theme_bg_b;
+  global.text_r = global.theme_fg_r;
+  global.text_g = global.theme_fg_g;
+  global.text_b = global.theme_fg_b;
+}
+
+Window.SetBackgroundTopColor(global.bg_r, global.bg_g, global.bg_b);
+Window.SetBackgroundBottomColor(global.bg_r, global.bg_g, global.bg_b);
+
 # Bold and larger, dead-centered.
-logo.image = Image.Text(global.logo_text, {{ foreground_rgb_float }}, 1, "JetBrainsMono Nerd Font Bold 48");
+logo.image = Image.Text(global.logo_text, global.text_r, global.text_g, global.text_b, 1, "JetBrainsMono Nerd Font Bold 48");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
 logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
