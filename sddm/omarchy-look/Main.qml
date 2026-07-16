@@ -56,31 +56,40 @@ Rectangle {
     // Only this wrapper is centered (same center line as the "PAMAC" text
     // above) - the lock icon hangs off its left edge instead of being part
     // of the centered group, so it doesn't pull the password box off-center.
+    //
+    // Drawn with plain QML shapes (Rectangle/Text) rather than the original
+    // Omarchy PNG assets (entry.png/lock.png/bullet.png) - those had the
+    // tokyo-night blue baked into the actual pixels, so they never picked up
+    // theme-set.sh's color substitution and stayed blue regardless of theme.
     Item {
       id: entryWrapper
       anchors.horizontalCenter: parent.horizontalCenter
-      width: entry.width
-      height: entry.height
+      width: 286
+      height: 48
 
-      Image {
+      Rectangle {
         id: entry
-        source: root.loginFailed ? "entry-failed.png" : "entry.png"
-        anchors.centerIn: parent
+        anchors.fill: parent
+        radius: 8
+        color: "transparent"
+        border.width: 2
+        border.color: root.loginFailed ? "{{ color1 }}" : "{{ foreground }}"
       }
 
       Row {
         anchors.left: parent.left
         anchors.leftMargin: 20
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
+        spacing: 6
 
         Repeater {
           model: Math.min(password.text.length, 21)
 
-          Image {
-            source: "bullet.png"
-            width: 7
-            height: 7
+          Rectangle {
+            width: 8
+            height: 8
+            radius: 4
+            color: "{{ foreground }}"
           }
         }
       }
@@ -114,11 +123,11 @@ Rectangle {
 
       // Positioned outside entryWrapper's own bounds (QML doesn't clip
       // children by default), so it doesn't affect entryWrapper's centering.
-      Image {
-        source: root.loginFailed ? "lock-failed.png" : "lock.png"
-        width: 34
-        height: 38
-        fillMode: Image.PreserveAspectFit
+      Text {
+        text: "󰌾"
+        font.family: "JetBrainsMono Nerd Font"
+        font.pixelSize: 26
+        color: root.loginFailed ? "{{ color1 }}" : "{{ foreground }}"
         anchors.right: parent.left
         anchors.rightMargin: 15
         anchors.verticalCenter: parent.verticalCenter

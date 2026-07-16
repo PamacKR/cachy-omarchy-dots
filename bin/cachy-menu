@@ -90,7 +90,10 @@ show_style_theme_menu() {
   local theme
   theme=$(menu "Theme" "$options" "" "$current")
   if [[ -n $theme ]]; then
-    "$CACHY_DOTS_PATH/theme-engine/theme-set.sh" "$theme"
+    # Runs in a real terminal, not inline - theme-set.sh needs sudo to
+    # update the SDDM/Plymouth files, and a bare invocation with no TTY has
+    # nowhere for sudo to prompt (silently failed before this).
+    terminal bash -c "\"$CACHY_DOTS_PATH/theme-engine/theme-set.sh\" \"$theme\"; echo; read -n1 -s -r -p 'Press any key to close...'"
   else
     back_to show_style_menu
   fi
