@@ -3,9 +3,9 @@
   "name": "Monochrome",
   "version": "1.0.0",
   "author": "PamacKR",
-  "description": "Pure black/white theme with a single blue accent for highlights.",
+  "description": "Pure black/white theme, no tinted accent.",
   "dark": {
-    "primary": "#4da6ff",
+    "primary": "#ffffff",
     "primaryText": "#000000",
     "primaryContainer": "#1a1a1a",
     "secondary": "#808080",
@@ -13,7 +13,7 @@
     "surfaceText": "#ffffff",
     "surfaceVariant": "#1a1a1a",
     "surfaceVariantText": "#cccccc",
-    "surfaceTint": "#4da6ff",
+    "surfaceTint": "#ffffff",
     "background": "#000000",
     "backgroundText": "#ffffff",
     "outline": "#4d4d4d",
@@ -21,18 +21,18 @@
     "surfaceContainerHigh": "#1a1a1a",
     "error": "#ff5c5c",
     "warning": "#e5c07b",
-    "info": "#4da6ff"
+    "info": "#ffffff"
   },
   "light": {
-    "primary": "#0066cc",
+    "primary": "#000000",
     "primaryText": "#ffffff",
-    "primaryContainer": "#d6e9ff",
+    "primaryContainer": "#e8e8e8",
     "secondary": "#666666",
     "surface": "#ffffff",
     "surfaceText": "#000000",
     "surfaceVariant": "#f0f0f0",
     "surfaceVariantText": "#333333",
-    "surfaceTint": "#0066cc",
+    "surfaceTint": "#000000",
     "background": "#ffffff",
     "backgroundText": "#000000",
     "outline": "#999999",
@@ -40,7 +40,7 @@
     "surfaceContainerHigh": "#e8e8e8",
     "error": "#cc3333",
     "warning": "#b8860b",
-    "info": "#0066cc"
+    "info": "#000000"
   },
   "sourceDir": "monochrome"
 }

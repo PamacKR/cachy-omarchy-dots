@@ -1,22 +1,20 @@
-# Pure black/white base (background, foreground, cursor, selection) - no
-# tinted grays. The ANSI colors (1-6, 9-14) keep muted versions of their
-# usual hues so terminal output that depends on color (git diffs, ls,
-# syntax highlighting) stays legible instead of turning fully grayscale.
-# The single spot of real color allowed to "pop" is accent/selection - a
-# cool blue, used sparingly for highlights (selected menu item, notification
-# border, cursor... actually cursor stays white for max legibility).
-accent = "#4da6ff"
+# Pure black/white, no tinted accent - background/foreground/cursor/
+# selection/accent are all black, white, or gray. The ANSI colors (1-6,
+# 9-14) keep muted versions of their usual hues so terminal output that
+# depends on color (git diffs, ls, syntax highlighting) stays legible
+# instead of turning fully grayscale - that's the only color left in.
+accent = "#ffffff"
 cursor = "#ffffff"
 foreground = "#ffffff"
 background = "#000000"
 selection_foreground = "#000000"
-selection_background = "#4da6ff"
+selection_background = "#ffffff"
 
 color0 = "#000000"
 color1 = "#e06c75"
 color2 = "#98c379"
 color3 = "#e5c07b"
-color4 = "#4da6ff"
+color4 = "#7dc1ff"
 color5 = "#c678dd"
 color6 = "#56b6c2"
 color7 = "#d0d0d0"
