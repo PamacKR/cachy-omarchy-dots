@@ -71,10 +71,40 @@ fi
 # read the fragment on next launch, so nothing to restart there.
 makoctl reload 2>/dev/null || systemctl --user restart mako.service 2>/dev/null || true
 systemctl --user restart walker.service 2>/dev/null || true
-systemctl --user restart dms.service 2>/dev/null || true
+
+# DMS owns wallpaper rendering itself (not swaybg) and has its own color
+# theme separate from the fragments above - set both via its IPC/settings so
+# this is a single switch for "everything", not just Alacritty/Walker/mako.
+if [[ -n "$first_bg" ]] && command -v dms >/dev/null 2>&1; then
+  dms ipc call wallpaper set "$first_bg" 2>/dev/null || true
+fi
+
+dms_theme_id_file="$theme_src/dms-theme-id"
+if [[ -f "$dms_theme_id_file" ]]; then
+  dms_theme_id="$(<"$dms_theme_id_file")"
+  dms_settings="$HOME/.config/DankMaterialShell/settings.json"
+  dms_theme_json="$HOME/.config/DankMaterialShell/themes/$dms_theme_id/theme.json"
+  if [[ -f "$dms_settings" && -f "$dms_theme_json" ]] && command -v jq >/dev/null 2>&1; then
+    tmp_settings="$(mktemp)"
+    if jq --arg f "$dms_theme_json" \
+      '.currentThemeName = "custom" | .customThemeFile = $f' \
+      "$dms_settings" >"$tmp_settings"; then
+      # Write through the existing file (which install.sh symlinks into the
+      # repo) instead of `mv`, which would replace the symlink itself with a
+      # plain file and silently break the live-edit relationship.
+      cat "$tmp_settings" >"$dms_settings"
+    fi
+    rm -f "$tmp_settings"
+  fi
+fi
+
+# Fallback wallpaper setter for testing without DMS running - harmless no-op
+# otherwise, since DMS's own rendering draws over/instead of this anyway.
 pkill -x swaybg 2>/dev/null || true
-if [[ -n "$first_bg" ]] && command -v swaybg >/dev/null 2>&1; then
+if [[ -n "$first_bg" ]] && ! command -v dms >/dev/null 2>&1 && command -v swaybg >/dev/null 2>&1; then
   (setsid swaybg -i "$first_bg" -m fill &>/dev/null &) || true
 fi
+
+systemctl --user restart dms.service 2>/dev/null || true
 
 echo "Theme set to '$theme_name'."
