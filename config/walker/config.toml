@@ -15,12 +15,8 @@ symbols = 1 # providers to be queried by default
 
 [providers]
 max_results = 256 # 256 should be enough for everyone
-empty = [
-  "desktopapplications",
-]
 default = [
   "desktopapplications",
-  "files",
   "websearch",
 ]
 
